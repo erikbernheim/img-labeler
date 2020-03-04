@@ -1,0 +1,37 @@
+<div class="container-fluid mb-4">
+    <div class="input-group ml-2 mt-1 mb-1" style="width:1100px">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Image URL</span>
+        </div>
+        <input type="text" class="form-control"
+            value='https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
+            #url aria-describedby="basic-addon1" (input)="updateImage()">
+    </div>
+    <button type="button" id="colorSelector0" (click)="changeColor(0)" class="btn btn-primary mr-2 ml-2"
+        [ngClass]="colorIndex == 0 ? 'underline': ''"
+        style="border-color:#402020; background-color:#402020">Road</button>
+    <button type="button" id="colorSelector1" (click)="changeColor(1)" class="btn btn-primary mr-2"
+        [ngClass]="colorIndex == 1 ? 'underline': ''" style="border-color:#ff0000; background-color:#ff0000">Lane
+        Markings</button>
+    <button type="button" id="colorSelector2" (click)="changeColor(2)" class="btn btn-primary mr-2"
+        [ngClass]="colorIndex == 2 ? 'underline': ''"
+        style="border-color:#808060; background-color:#808060">Undrivable</button>
+    <button type="button" id="colorSelector3" (click)="changeColor(3)" class="btn btn-primary mr-2"
+        [ngClass]="colorIndex == 3 ? 'underline': ''"
+        style="border-color:#00ff66; background-color:#00ff66">Movable</button>
+    <button type="button" id="colorSelector4" (click)="changeColor(4)" class="btn btn-primary mr-2"
+        [ngClass]="colorIndex == 4 ? 'underline': ''" style="border-color:#cc00ff; background-color:#cc00ff">My
+        Car</button>
+    <div class="input-group ml-2 mt-1" style="width:250px">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
+        </div>
+        <input type="number" class="form-control" value='100' #opacity aria-describedby="basic-addon1"
+            (input)="updateOpacity()">
+    </div>
+
+    <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="save()">Save</button>
+
+    <div class="artboard" (mouseup)="mouseUp($event)" (mousemove)="mouseMove($event)" #artboard>
+    </div>
+</div>

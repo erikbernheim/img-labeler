@@ -1,0 +1,15 @@
+@import '~bootstrap/dist/css/bootstrap.css';
+svg{
+    background: url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png');
+    background-size: 1164px 874px;
+    background-position: center;
+    background-repeat: no-repeat;
+    
+}
+
+.underline{
+    text-decoration: underline;
+}
+
+.artboard{
+}
