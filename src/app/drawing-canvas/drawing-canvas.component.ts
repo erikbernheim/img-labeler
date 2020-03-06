@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Renderer2 } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, HostListener } from '@angular/core';
 import * as d3 from 'd3';
 import * as svg from 'save-svg-as-png';
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
@@ -19,6 +19,7 @@ export class DrawingCanvasComponent implements OnInit {
     public startPoint = [];
     public svg;
     public g;
+    public isCollapsed = false;
     public points = []
     public color: string = '#402020';
     public colorIndex: number = 0;
@@ -229,6 +230,16 @@ export class DrawingCanvasComponent implements OnInit {
     public deleteLayer(i: number) {
     this.artboard.nativeElement.children[0].children[i].remove()
 
+    }
+
+    @HostListener('document:keypress', ['$event'])
+    handleKeyboardEvent(event: KeyboardEvent) { 
+      console.log(event)
+      if(event.key.toUpperCase() == "R" ) this.changeColor(0)
+      if(event.key.toUpperCase() == "L" ) this.changeColor(1)
+      if(event.key.toUpperCase() == "U" ) this.changeColor(2)
+      if(event.key.toUpperCase() == "M" ) this.changeColor(3)
+      if(event.key.toUpperCase() == "C" ) this.changeColor(4)
     }
 
 

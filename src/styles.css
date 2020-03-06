@@ -17,7 +17,7 @@ svg{
 }
 
 html{
-    overflow:hidden
+    overflow: hidden;
 }
 
 th { display: table-cell; direction: ltr;}

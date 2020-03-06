@@ -9,53 +9,69 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-    <button type="button" id="colorSelector0" (click)="changeColor(0)" class="btn btn-primary mr-2 ml-2"
-        [ngClass]="colorIndex == 0 ? 'underline': ''"
-        style="border-color:#402020; background-color:#402020">Road</button>
-    <button type="button" id="colorSelector1" (click)="changeColor(1)" class="btn btn-primary mr-2"
-        [ngClass]="colorIndex == 1 ? 'underline': ''" style="border-color:#ff0000; background-color:#ff0000">Lane
-        Markings</button>
-    <button type="button" id="colorSelector2" (click)="changeColor(2)" class="btn btn-primary mr-2"
-        [ngClass]="colorIndex == 2 ? 'underline': ''"
-        style="border-color:#808060; background-color:#808060">Undrivable</button>
-    <button type="button" id="colorSelector3" (click)="changeColor(3)" class="btn btn-primary mr-2"
-        [ngClass]="colorIndex == 3 ? 'underline': ''"
-        style="border-color:#00ff66; background-color:#00ff66">Movable</button>
-    <button type="button" id="colorSelector4" (click)="changeColor(4)" class="btn btn-primary mr-2"
-        [ngClass]="colorIndex == 4 ? 'underline': ''" style="border-color:#cc00ff; background-color:#cc00ff">My
-        Car</button>
-    <div class="input-group ml-2 mt-1" style="width:250px">
-        <div class="input-group-prepend">
-            <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
-        </div>
-        <input type="number" class="form-control" value='100' #opacity aria-describedby="basic-addon1"
-            (input)="updateOpacity()">
-    </div>
+            <button type="button" id="colorSelector0" (click)="changeColor(0)" class="btn btn-primary mr-2 ml-2"
+                [ngClass]="colorIndex == 0 ? 'underline': ''"
+                style="border-color:#402020; background-color:#402020">Road</button>
+            <button type="button" id="colorSelector1" (click)="changeColor(1)" class="btn btn-primary mr-2"
+                [ngClass]="colorIndex == 1 ? 'underline': ''"
+                style="border-color:#ff0000; background-color:#ff0000">Lane
+                Markings</button>
+            <button type="button" id="colorSelector2" (click)="changeColor(2)" class="btn btn-primary mr-2"
+                [ngClass]="colorIndex == 2 ? 'underline': ''"
+                style="border-color:#808060; background-color:#808060">Undrivable</button>
+            <button type="button" id="colorSelector3" (click)="changeColor(3)" class="btn btn-primary mr-2"
+                [ngClass]="colorIndex == 3 ? 'underline': ''"
+                style="border-color:#00ff66; background-color:#00ff66">Movable</button>
+            <button type="button" id="colorSelector4" (click)="changeColor(4)" class="btn btn-primary mr-2"
+                [ngClass]="colorIndex == 4 ? 'underline': ''" style="border-color:#cc00ff; background-color:#cc00ff">My
+                Car</button>
+            <div class="input-group ml-2 mt-1" style="width:250px">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
+                </div>
+                <input type="number" class="form-control" value='100' #opacity aria-describedby="basic-addon1"
+                    (input)="updateOpacity()">
+            </div>
 
-    <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="save()">Save</button>
-    <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="undo()">Undo</button>
+            <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="save()">Save</button>
+            <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="undo()">Undo</button>
+        </div>
+        <div class="col-md-6" *ngIf="layers">
+
+            <button type="button" class="btn btn-outline-primary mt-1" (click)="isCollapsed = !isCollapsed"
+                [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
+                Layers
+            </button>
+            <div id="collapseExample" *ngIf="isCollapsed" style="overflow:scroll!important">
+                <div class="card">
+                    <div class="card-body">
+
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Layer</th>
+                                    <th scope="col">To Top</th>
+                                    <th scope="col">Hide/Show</th>
+                                    <th scope="col">Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let layer of layers, index as i">
+                                    <th>Layer {{i}}</th>
+                                    <th (click)="toFront(i)"><i class="fa fa-arrow-up" aria-hidden="true"></i></th>
+                                    <th (click)="toggleVisibility(i)"><i *ngIf="getVisibility(i)" class="fa fa-eye"
+                                            aria-hidden="true"></i><i *ngIf="!getVisibility(i)" class="fa fa-eye-slash"
+                                            aria-hidden="true"></i></th>
+                                    <th (click)="deleteLayer(i)"><i class="fa fa-times" aria-hidden="true"></i>
+                                    </th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="col-md-6" *ngIf="layers">
-            <table class="table table-striped">
-                    <thead>
-                      <tr>
-                        <th scope="col">Layer</th>
-                        <th scope="col">To Top</th>
-                        <th scope="col">Hide/Show</th>
-                        <th scope="col">Delete</th>
-                        </tr></thead>
-                        <tbody>
-        <tr *ngFor="let layer of layers, index as i">
-            <th>Layer {{i}}</th>
-            <th (click)="toFront(i)"><i class="fa fa-arrow-up" aria-hidden="true"></i></th>
-            <th (click)="toggleVisibility(i)"><i *ngIf="getVisibility(i)" class="fa fa-eye" aria-hidden="true"></i><i *ngIf="!getVisibility(i)" class="fa fa-eye-slash" aria-hidden="true"></i></th>
-            <th (click)="deleteLayer(i)"><i class="fa fa-times" aria-hidden="true"></i>
-            </th>
-        </tr>
-    </tbody>
-    </table>
-    </div>
-</div>
     <pan-zoom [config]="panzoomConfig">
         <div class="artboard" (mouseup)="mouseUp($event)" (mousemove)="mouseMove($event)" #artboard>
         </div>
