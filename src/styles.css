@@ -12,4 +12,12 @@ svg{
 }
 
 .artboard{
+    -webkit-transform-origin: 0 0;
+    transform-origin: 0 0;
 }
+
+html{
+    overflow:hidden
+}
+
+th { display: table-cell; direction: ltr;}

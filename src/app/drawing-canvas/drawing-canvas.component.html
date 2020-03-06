@@ -1,4 +1,4 @@
-<div class="container-fluid mb-4">
+<div class="container-fluid mb-4" style="position: absolute; top: 50px; bottom: 0; left: 0; right: 0;">
     <div class="input-group ml-2 mt-1 mb-1" style="width:1100px">
         <div class="input-group-prepend">
             <span class="input-group-text" id="basic-addon1">Image URL</span>
@@ -7,6 +7,8 @@
             value='https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
             #url aria-describedby="basic-addon1" (input)="updateImage()">
     </div>
+    <div class="row">
+        <div class="col-md-6">
     <button type="button" id="colorSelector0" (click)="changeColor(0)" class="btn btn-primary mr-2 ml-2"
         [ngClass]="colorIndex == 0 ? 'underline': ''"
         style="border-color:#402020; background-color:#402020">Road</button>
@@ -31,7 +33,31 @@
     </div>
 
     <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="save()">Save</button>
-
-    <div class="artboard" (mouseup)="mouseUp($event)" (mousemove)="mouseMove($event)" #artboard>
+    <button type="button" class="btn btn-primary mt-1 ml-2 mb-2" (click)="undo()">Undo</button>
     </div>
+    <div class="col-md-6" *ngIf="layers">
+            <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th scope="col">Layer</th>
+                        <th scope="col">To Top</th>
+                        <th scope="col">Hide/Show</th>
+                        <th scope="col">Delete</th>
+                        </tr></thead>
+                        <tbody>
+        <tr *ngFor="let layer of layers, index as i">
+            <th>Layer {{i}}</th>
+            <th (click)="toFront(i)"><i class="fa fa-arrow-up" aria-hidden="true"></i></th>
+            <th (click)="toggleVisibility(i)"><i *ngIf="getVisibility(i)" class="fa fa-eye" aria-hidden="true"></i><i *ngIf="!getVisibility(i)" class="fa fa-eye-slash" aria-hidden="true"></i></th>
+            <th (click)="deleteLayer(i)"><i class="fa fa-times" aria-hidden="true"></i>
+            </th>
+        </tr>
+    </tbody>
+    </table>
+    </div>
+</div>
+    <pan-zoom [config]="panzoomConfig">
+        <div class="artboard" (mouseup)="mouseUp($event)" (mousemove)="mouseMove($event)" #artboard>
+        </div>
+    </pan-zoom>
 </div>

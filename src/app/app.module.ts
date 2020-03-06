@@ -4,6 +4,9 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DrawingCanvasComponent } from './drawing-canvas/drawing-canvas.component';
 import { CanvasMapComponent } from './canvas-map/canvas-map.component';
+import { Ng2PanZoomModule } from 'ng2-panzoom';
+
+
 
 @NgModule({
   declarations: [
@@ -14,8 +17,9 @@ import { CanvasMapComponent } from './canvas-map/canvas-map.component';
   ],
   imports: [
     BrowserModule,
-    AppRoutingModule
-  ],
+    AppRoutingModule,
+    Ng2PanZoomModule,
+    ],
   providers: [],
   bootstrap: [AppComponent]
 })
