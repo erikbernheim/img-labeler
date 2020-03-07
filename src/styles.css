@@ -18,6 +18,27 @@ svg{
 
 html{
     overflow: hidden;
+    background-color:#2b2b2b;
 }
 
 th { display: table-cell; direction: ltr;}
+
+
+.form-control{
+    background:#5a5a5a;
+    color:#fff;
+    border-color: #5a5a5a;
+}
+
+.form-control:focus{
+    background:#5a5a5a;
+    color:#fff;
+    border-color: #5a5a5a;
+}
+
+.input-group-text{
+    background:#212529;
+    color:#fff;
+    border-color: #212529;
+}
+

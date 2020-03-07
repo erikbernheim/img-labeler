@@ -86,7 +86,7 @@ export class DrawingCanvasComponent implements OnInit {
     public closePolygon() {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         this.svg.select('g.drawPoly').remove();
-        var g = this.svg.append('g');
+        var g = this.svg.append('g').attr('class', this.color);
         g.append('polygon')
             .attr('points', this.points)
             .attr('shape-rendering', 'crispEdges')
@@ -164,7 +164,7 @@ export class DrawingCanvasComponent implements OnInit {
     public save(): void {
         this.svg.selectAll('polygon').style('opacity', 1);
         this.svg.selectAll('circle').style('opacity', 0);
-        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 43, left: 38 });
+        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 38, left: 43 });
 
     }
     public changeColor(id: number): void {
@@ -210,6 +210,10 @@ export class DrawingCanvasComponent implements OnInit {
         this.artboard.nativeElement.children[0].append(this.artboard.nativeElement.children[0].children[i])
     }
 
+    public toBottom(i: number) {
+        this.artboard.nativeElement.children[0].prepend(this.artboard.nativeElement.children[0].children[i])
+    }
+
     public toggleVisibility(i: number) {
         if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') != '0%') {
             this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', '0%')
@@ -234,13 +238,23 @@ export class DrawingCanvasComponent implements OnInit {
 
     @HostListener('document:keypress', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) { 
-      console.log(event)
-      if(event.key.toUpperCase() == "R" ) this.changeColor(0)
-      if(event.key.toUpperCase() == "L" ) this.changeColor(1)
-      if(event.key.toUpperCase() == "U" ) this.changeColor(2)
-      if(event.key.toUpperCase() == "M" ) this.changeColor(3)
-      if(event.key.toUpperCase() == "C" ) this.changeColor(4)
+      if(event.code == "KeyR" ) this.changeColor(0)
+      if(event.code == "KeyL" ) this.changeColor(1)
+      if(event.code == "KeyU" ) this.changeColor(2)
+      if(event.code == "KeyM" ) this.changeColor(3)
+      if(event.code == "KeyC" ) this.changeColor(4)
+      if(event.code == "KeyZ" && event.ctrlKey == true ) this.undo()
     }
 
+    public getLayerType(i: number): String {
+        
+        let colors = [['#402020', 'Road'], ['#ff0000', 'Lane Markings'], ['#808060', 'Undrivable'], ['#00ff66', 'Movable'], ['#cc00ff', 'My Car']]
+        for(var j = 0; j < colors.length; j++){
+            if( colors[j][0] == this.artboard.nativeElement.children[0].children[i].getAttribute('class')){
+                return colors[j][1]
+            }
+        }
+        return 'In Progress'
+        }
 
     }
