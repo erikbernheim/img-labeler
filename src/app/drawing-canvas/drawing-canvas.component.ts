@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Renderer2, HostListener } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, HostListener, AfterViewInit } from '@angular/core';
 import * as d3 from 'd3';
 import * as svg from 'save-svg-as-png';
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
@@ -11,7 +11,21 @@ import * as cloneDeep from 'lodash.cloneDeep';
     templateUrl: './drawing-canvas.component.html',
     styleUrls: ['./drawing-canvas.component.css']
 })
-export class DrawingCanvasComponent implements OnInit {
+export class DrawingCanvasComponent implements OnInit, AfterViewInit {
+    ngAfterViewInit(): void {
+     //   if(localStorage.getItem('artboard')){
+     //       this.artboard.nativeElement.children[0].innerHTML = JSON.parse(localStorage.getItem('artboard'))
+     //       this.layers = this.artboard.nativeElement.children[0].children;
+     //       this.opacity.nativeElement.value = localStorage.getItem('opacity');
+     //       this.providedURL = localStorage.getItem('url');
+     //       this.drawing = false;
+     //   }
+     //   else{
+            this.providedURL = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
+     //   }
+        this.updateImage(this.providedURL)
+    }
+ 
 
     constructor(private renderer: Renderer2) { }
     public dragging = false;
@@ -24,6 +38,7 @@ export class DrawingCanvasComponent implements OnInit {
     public color: string = '#402020';
     public colorIndex: number = 0;
     public history = [];
+    public providedURL: string;
     public panzoomConfig: PanZoomConfig = new PanZoomConfig({
         zoomLevels: 10,
         scalePerZoomLevel: 1.5,
@@ -44,11 +59,13 @@ export class DrawingCanvasComponent implements OnInit {
     @ViewChild('url') url;
 
     ngOnInit(): void {
+        
         this.apiSubscription = this.panzoomConfig.api.subscribe((api: PanZoomAPI) => this.panZoomAPI = api);
         this.modelChangedSubscription = this.panzoomConfig.modelChanged.subscribe((model: PanZoomModel) => {
             this.onModelChanged(model);
             this.panzoomModel = model;
         });
+      
 
         this.svg = d3.select('.artboard').append('svg')
             .attr('height', 950)
@@ -86,7 +103,7 @@ export class DrawingCanvasComponent implements OnInit {
     public closePolygon() {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         this.svg.select('g.drawPoly').remove();
-        var g = this.svg.append('g').attr('class', this.color);
+        var g = this.svg.append('g').attr('class', this.color + ' completePoly').attr('layerHidden', 'false');
         g.append('polygon')
             .attr('points', this.points)
             .attr('shape-rendering', 'crispEdges')
@@ -105,6 +122,7 @@ export class DrawingCanvasComponent implements OnInit {
                 .attr('stroke', '#000')
                 .attr('is-handle', 'true')
                 .attr('cursor', 'move')
+                .attr('onClick', 'console.log("test")')
                 .call(d3.drag()
                     .on('drag', function () {
                         holder.handleDrag(this);
@@ -115,6 +133,7 @@ export class DrawingCanvasComponent implements OnInit {
         }
         this.points.splice(0);
         this.drawing = false;
+        this.addToLocalStorage();
         this.layers = this.artboard.nativeElement.children[0].children;
     }
     public mouseMove(e) {
@@ -156,14 +175,14 @@ export class DrawingCanvasComponent implements OnInit {
 
     public updateOpacity(): void {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
-        this.svg.selectAll('polygon').style('opacity', this.opacity.nativeElement.value * .01);
-        this.svg.selectAll('circle').style('opacity', this.opacity.nativeElement.value * .01);
+
+    this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
 
     }
 
     public save(): void {
-        this.svg.selectAll('polygon').style('opacity', 1);
-        this.svg.selectAll('circle').style('opacity', 0);
+        this.svg.selectAll('polygon').attr('opacity', 1);
+        this.svg.selectAll('circle').attr('opacity', 0);
         svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 38, left: 43 });
 
     }
@@ -173,8 +192,9 @@ export class DrawingCanvasComponent implements OnInit {
         this.colorIndex = id;
     }
 
-    public updateImage(): void {
-        this.svg.style('background-image', `url('${this.url.nativeElement.value}')`)
+    public updateImage(url?): void {
+       if(url){ this.svg.style('background-image', `url('${url}')`)}
+       else{this.svg.style('background-image', `url('${this.url.nativeElement.value}')`)}
     }
 
     onModelChanged(model: PanZoomModel): void {
@@ -186,12 +206,20 @@ export class DrawingCanvasComponent implements OnInit {
 
     public addToHistory(drawing, startPoint, g, points): void {
         let collection = this.artboard.nativeElement.children[0].innerHTML
-        var s = new XMLSerializer();
         cloneDeep(g)
         this.history.unshift([JSON.stringify(collection), JSON.stringify(drawing), JSON.stringify(startPoint), cloneDeep(g), JSON.stringify(points)])
         if (this.history.length > 15) {
             this.history.pop()
         }
+    }
+
+    public addToLocalStorage(): void {
+        let collection = this.artboard.nativeElement.children[0].innerHTML
+
+        localStorage.setItem('artboard', JSON.stringify(collection));
+        localStorage.setItem('url', this.url.nativeElement.value);
+        localStorage.setItem('opacity', this.opacity.nativeElement.value)
+
     }
 
     public undo(): void {
@@ -215,17 +243,20 @@ export class DrawingCanvasComponent implements OnInit {
     }
 
     public toggleVisibility(i: number) {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') != '0%') {
-            this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', '0%')
+        console.log(this.svg.selectAll('g'))
+        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') != '0') {
+            this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', '0')
+            this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'true')
             return
         }
 
         this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', this.opacity.nativeElement.value * .01)
+        this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'false')
 
     }
 
     public getVisibility(i: number): boolean {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') != '0%') {
+        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') != '0') {
             return true
         }
         return false
@@ -248,7 +279,7 @@ export class DrawingCanvasComponent implements OnInit {
 
     public getLayerType(i: number): String {
         
-        let colors = [['#402020', 'Road'], ['#ff0000', 'Lane Markings'], ['#808060', 'Undrivable'], ['#00ff66', 'Movable'], ['#cc00ff', 'My Car']]
+        let colors = [['#402020 completePoly', 'Road'], ['#ff0000 completePoly', 'Lane Markings'], ['#808060 completePoly', 'Undrivable'], ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car']]
         for(var j = 0; j < colors.length; j++){
             if( colors[j][0] == this.artboard.nativeElement.children[0].children[i].getAttribute('class')){
                 return colors[j][1]
@@ -256,5 +287,12 @@ export class DrawingCanvasComponent implements OnInit {
         }
         return 'In Progress'
         }
+
+        public reset(): void{
+            if(confirm("This will reset your entire document. Continue?")){
+            localStorage.clear();
+            location.reload();
+            }
+         }
 
     }
