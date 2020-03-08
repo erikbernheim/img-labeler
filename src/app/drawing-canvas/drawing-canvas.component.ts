@@ -21,9 +21,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
      //       this.drawing = false;
      //   }
      //   else{
-            this.providedURL = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
+     //       this.providedURL = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
      //   }
-        this.updateImage(this.providedURL)
+  //      this.updateImage(this.providedURL)
     }
  
 
@@ -90,11 +90,13 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
         var polyline = this.svg.select('g.drawPoly').append('polyline').attr('points', this.points)
             .style('fill', 'none')
+            .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel/2))
             .attr('stroke', '#000');
         this.svg.select('g.drawPoly').append('circle')
             .attr('cx', this.points[this.points.length - 1][0])
             .attr('cy', this.points[this.points.length - 1][1])
             .attr('r', 4 / this.panzoomModel.zoomLevel)
+            .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel/2))
             .attr('fill', 'yellow')
             .attr('stroke', '#000')
             .attr('is-handle', 'true')
@@ -103,11 +105,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public closePolygon() {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         this.svg.select('g.drawPoly').remove();
-        var g = this.svg.append('g').attr('class', this.color + ' completePoly').attr('layerHidden', 'false');
+        var g = this.svg.append('g').attr('class', this.color + ' completePoly').attr('layerHidden', 'false').attr('opacity', this.opacity.nativeElement.value * .01);
         g.append('polygon')
             .attr('points', this.points)
             .attr('shape-rendering', 'crispEdges')
-            .attr('opacity', this.opacity.nativeElement.value * .01)
             .style('fill', this.color);
         for (var i = 0; i < this.points.length; i++) {
             let holder = this;
@@ -118,6 +119,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 .attr('cx', this.points[i][0])
                 .attr('cy', this.points[i][1])
                 .attr('r', 4 / this.panzoomModel.zoomLevel)
+                .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel/2))
                 .attr('fill', '#FDBC07')
                 .attr('stroke', '#000')
                 .attr('is-handle', 'true')
@@ -154,7 +156,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('x2', e.offsetX)
             .attr('y2', e.offsetY)
             .attr('stroke', '#53DBF3')
-            .attr('stroke-width', 1);
+            .attr('stroke-width', 1/ (this.panzoomModel.zoomLevel * 1.3));
     }
 
     public handleDrag(e) {
@@ -181,9 +183,18 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public save(): void {
-        this.svg.selectAll('polygon').attr('opacity', 1);
+        this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('circle').attr('opacity', 0);
-        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 38, left: 43 });
+        this.svg.insert("polygon",":first-child").attr('class', 'background').style('fill', '#808060').attr('points','0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
+        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 }).then(
+            () => {
+                this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
+                this.svg.selectAll('circle').attr('opacity', 1);
+                this.svg.selectAll('.background').remove();
+            }
+        );
+
+
 
     }
     public changeColor(id: number): void {
@@ -193,13 +204,17 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public updateImage(url?): void {
+        console.log(url)
        if(url){ this.svg.style('background-image', `url('${url}')`)}
+       
        else{this.svg.style('background-image', `url('${this.url.nativeElement.value}')`)}
     }
 
     onModelChanged(model: PanZoomModel): void {
         if (this.artboard && model.zoomLevel >= 1) {
-            this.svg.selectAll('circle').attr('r', 4 / model.zoomLevel);
+            this.svg.selectAll('circle').attr('r', 4 / (model.zoomLevel/1.5));
+            this.svg.selectAll('polyline').attr('stroke-width', 1 / (model.zoomLevel/2));
+            this.svg.selectAll('circle').attr('stroke-width', 1 / (model.zoomLevel/2));
 
         }
     }
