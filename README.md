@@ -24,7 +24,7 @@ Step 7: Save your image
 
 
 ### Upload your labeled images to GitHub  and make a Pull Request
-Step 1: Fork comma10k https://github.com/commaai/comma10k/tree/master/img
+Step 1: Fork comma10k https://github.com/commaai/comma10k/
 
 Step 2: Go to the mask directory.
 
