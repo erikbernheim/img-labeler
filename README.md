@@ -2,6 +2,7 @@
 
 ### Live Demo Here https://erikbernheim.github.io/img-labeler/
 
+![Landing Image](https://raw.githubusercontent.com/erikbernheim/img-labeler/master/docs/git_landing_img.png)
 
 ## img-labeler recommended workflow
 Step 0: Visit the comma10k img directory and copy the direct image address of the image you want to label: https://github.com/commaai/comma10k/tree/master/img
