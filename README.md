@@ -1,35 +1,39 @@
 # img-labeler
 
-#Live Demo Here https://erikbernheim.github.io/img-labeler/
+### Live Demo Here https://erikbernheim.github.io/img-labeler/
 
-Doc is coming!
 
-# Overall workflow with comma and the img-labeler
-
-## comma and github part
-Fork https://github.com/commaai/comma10k
-Create a branch from your github master. You will later on upload your finished masks into the masks directory of your branch.
-
-## img-labeler page
-Step 0: Goto to commai img directory to get the address of the image you want to label: https://github.com/commaai/comma10k/tree/master/imgs
-click on the link of the imag to get the image displayed.
+## img-labeler recommended workflow
+Step 0: Visit the comma10k img directory and copy the direct image address of the image you want to label: https://github.com/commaai/comma10k/tree/master/img
 Right-click on the image to copy its address.
-Step 1: paste the address of the image to the Image Url box. Note that the address of the image is with raw=true
-The image is displayed on automatically once you pasted the address.
-Step 2: start with the "road" label, by clicking on the "Road" button. Then mark the contour of all the roads of the image. I usually start by dropping a point outside the picture so that at the end the picture is completely covered (not missing some point on the border of the image).
-Note also that each object is a layer.
-Step 3: Then do the lane marking by clicking on the corresponding button (bright red!)
-Step 4: Do the "movable" (bright green): cars (even the other side of the road and parked cars), people, animal, bikes...
-Step 5: Do the "my-car" pink. Start by dropping a point outside of the image, again to avoid unmarked points.
 
-Do not worry about other unmarked area e.g. sky, road separations, trees... The tool will automatically mark them as "undrivable"
-The tool will also crop automatically the area outside the picture when you save your work to your desktop (download directory).
+Step 1: Launch the img-labeler app from the URL above, and paste the URL into the Image URL box.
 
-## Upload your labeled images to github and make a Pull Request
-Step 1: goto your branch in github, you created in first first step.
-Step 2: got to the masks directory
-Step 3: Upload your files to your masks directory (button top right)
-Step 4: you'll put a title like 'masks for XXX-YYY', then click commit
+Step 2: Start by changing your color to the “moveable” color, (either by clicking movable, or m on your keyboard), then zoom in (with scroll), and place masks by clicking tightly around all movable objects (cars, motorcycles, bicycles, etc…)
+*NOTE: The tool automatically crops your image when you save, drawing outside the lines is encouraged, to prevent any blank space on the borders, layers should also overlap as you work. Many users also like to lower the mask opacity as they work.*
+
+Step 3: Now label lane markings using the same process as above.
+
+Step 4: Label the road, and by using the layers palette, send the road layer to the bottom.
+
+Step 5: Label "my-car" in pink. Start by dropping a point outside of the image, to avoid unmarked points.
+
+Step 6: Undriveable is optional, img-labeler will automatically add undriveable to any areas left blank when you save.
+
+Step 7: Save your image
+
+
+### Upload your labeled images to GitHub  and make a Pull Request
+Step 1: Fork comma10k https://github.com/commaai/comma10k/tree/master/img
+
+Step 2: Go to the mask directory.
+
+Step 3: Replace the existing masks in your range, with the masks you updated.
+
+Step 4: Create a pull request between your branch and comma10k master.
+
 Step 5: Create a Pull Request (this will ask comma guys to check your images etc...). Name it and click Pull Request.
-Then your done with this branch, only upload updates to your already submitted images, when requested for modifications, correction, completion by comma's guys.
-When you want to label more images, create a new branch from your master! Otherwise, you'll get conflicts or other github errors stuff.
+
+Report any issues in GitHub issues for this repo or in Discord.
+
+Any git questions can usually be answered on StackOverflow.
