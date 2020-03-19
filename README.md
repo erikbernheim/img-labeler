@@ -5,7 +5,7 @@
 ![Landing Image](https://raw.githubusercontent.com/erikbernheim/img-labeler/master/docs/git_landing_img.png)
 
 ## img-labeler recommended workflow
-Step 0: Visit the comma10k img directory and copy the direct image address of the image you want to label: https://github.com/commaai/comma10k/tree/master/img
+Step 0: Visit the comma10k img directory and copy the direct image address of the image you want to label: https://github.com/commaai/comma10k/tree/master/imgs
 Right-click on the image to copy its address.
 
 Step 1: Launch the img-labeler app from the URL above, and paste the URL into the Image URL box.
