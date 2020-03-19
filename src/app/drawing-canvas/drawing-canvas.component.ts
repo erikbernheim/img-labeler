@@ -183,10 +183,11 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public save(): void {
+        console.log();
         this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('circle').attr('opacity', 0);
         this.svg.insert("polygon",":first-child").attr('class', 'background').style('fill', '#808060').attr('points','0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
-        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.split('/').pop(), { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 }).then(
+        svg.saveSvgAsPng(this.artboard.nativeElement.children[0], this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0].replace(/.(png|jpg)/, ''), { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 }).then(
             () => {
                 this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
                 this.svg.selectAll('circle').attr('opacity', 1);
