@@ -15,19 +15,6 @@
     <button type="button" id="colorSelector4" (click)="changeColor(4)" class="btn btn-primary"
         [ngClass]="colorIndex == 4 ? 'underline': ''" style="border-color:#cc00ff; background-color:#cc00ff">My
         Car</button>
-        <button type="button" class="btn btn-outline-light" (click)="undo()">Undo</button>
-    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
-        <button class="btn btn-outline-light" id="dropdownBasic2" ngbDropdownToggle>Opacity</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic2" style="overflow:auto; max-height: 600px;" class="bg-dark">
-            <div class="input-group ml-2 mt-1" style="width:250px">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
-                </div>
-                <input type="number" class="form-control" value='100' #opacity aria-describedby="basic-addon1"
-                    (input)="updateOpacity()">
-            </div>
-        </div>
-    </div>
 
     <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
         <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle>Image URL</button>
@@ -37,18 +24,24 @@
                     <span class="input-group-text" id="basic-addon1">Image URL</span>
                 </div>
                 <input type="text" class="form-control"
-                    value='{{providedURL}}' value='https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
+                    value='https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
                     #url aria-describedby="basic-addon1" (input)="updateImage()">
             </div>
 
         </div>
     </div>
 
-
-
     <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
         <button class="btn btn-outline-light" id="dropdownBasic1" ngbDropdownToggle>Layers</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" style="overflow:auto; max-height: 600px; width:600px;" class="bg-dark">
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" style="overflow:auto; max-height: 600px; width:600px;"
+            class="bg-dark">
+            <div class="input-group ml-2 mt-1 mb-2" style="width:250px">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
+                </div>
+                <input type="number" class="form-control" value='100' #opacity aria-describedby="basic-addon1"
+                    (input)="updateOpacity()">
+            </div>
             <table class="table table-striped table-dark" *ngIf="layers">
                 <thead>
                     <tr>
@@ -66,8 +59,8 @@
                         <th *ngIf="getLayerType(i) != 'In Progress'">{{getLayerType(i)}}</th>
                         <th (click)="toFront(i)" *ngIf="getLayerType(i) != 'In Progress'"><i class="fa fa-arrow-up"
                                 aria-hidden="true"></i></th>
-                                <th (click)="toBottom(i)" *ngIf="getLayerType(i) != 'In Progress'"><i class="fa fa-arrow-down"
-                                    aria-hidden="true"></i></th>
+                        <th (click)="toBottom(i)" *ngIf="getLayerType(i) != 'In Progress'"><i class="fa fa-arrow-down"
+                                aria-hidden="true"></i></th>
                         <th (click)="toggleVisibility(i)" *ngIf="getLayerType(i) != 'In Progress'"><i
                                 *ngIf="getVisibility(i)" class="fa fa-eye" aria-hidden="true"></i><i
                                 *ngIf="!getVisibility(i)" class="fa fa-eye-slash" aria-hidden="true"></i></th>
@@ -80,10 +73,20 @@
             <div class="alert alert-dark" *ngIf="!layers">No Layers Yet</div>
         </div>
     </div>
-
+    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
+        <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle>Advanced</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic3" style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px" class="bg-dark">
+            <h5>Revert From History</h5>
+            <div *ngFor="let item of localStorage">
+                <span (click)="revertFromLocalStorage(item[1])">{{item[0]}}</span>
+            </div>
+        </div>
+    </div>
     <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
         <button class="btn btn-outline-light" id="dropdownBasic4" ngbDropdownToggle>Help</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic4" style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px" class="bg-dark">
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic4"
+            style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px"
+            class="bg-dark">
             <h5>Controls</h5>
             Scroll: Zoom<br>
             Left Click: Place Point<br>
@@ -93,15 +96,17 @@
             Arrange layers with the To Top button in the Layers Panel.<br>
             <br><br>
             <h5>How to use</h5>
-            This is how I personally use this tool the quickest. First, I label all the movables and lane markings. Next, I label the road, and move it to the bottom with the layer palette. Then I add a box of undrivable over the entire image and move it to the bottom. Finally, I add the car section over the hood
-            
-           
+            This is how I personally use this tool the quickest. First, I label all the movables and lane markings.
+            Next, I label the road, and move it to the bottom with the layer palette. Then I add a box of undrivable
+            over the entire image and move it to the bottom. Finally, I add the car section over the hood
+
+
         </div>
     </div>
     <button type="button" class="btn btn-outline-light" (click)="save()">Save</button>
     <button type="button" class="btn btn-outline-danger" (click)="reset()">Reset</button>
 
-    
+
 </nav>
 <div class="container-fluid mb-4" style="position: absolute; top: 75px; bottom: 0; left: 0; right: 0;">
     <pan-zoom [config]="panzoomConfig">

@@ -9,7 +9,6 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
 
-
 @NgModule({
   declarations: [
     AppComponent,
@@ -21,7 +20,7 @@ import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
     BrowserModule,
     AppRoutingModule,
     Ng2PanZoomModule,
-    NgbModule
+    NgbModule,
     ],
   providers: [],
   bootstrap: [AppComponent]
