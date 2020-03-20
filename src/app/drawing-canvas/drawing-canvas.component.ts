@@ -38,7 +38,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     private apiSubscription: Subscription;
     private modelChangedSubscription: Subscription;
     public layers;
-    public localStorage;
+    public localStorage = [];
     @ViewChild('artboard') artboard;
     @ViewChild('opacity') opacity;
     @ViewChild('url') url;
@@ -49,13 +49,12 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     constructor(private renderer: Renderer2) { }
 
     ngOnInit(): void {
-        // this is just here for one or two weeks to remove some old keys from user's localstorage
-        localStorage.removeItem('opacity');
-        localStorage.removeItem('artboard');
-        localStorage.removeItem('url');
-        this.localStorage = Object.entries(localStorage);
-        for (const item of this.localStorage) {
-            item[0] = item[0].match(/[\w-]+\.(png|jpg)/)[0].substring(0, 4);
+        const storage = Object.entries(localStorage);
+        for (const item of storage) {
+            if (item[0].includes('github')) {
+                item[0] = item[0].match(/[\w-]+\.(png|jpg)/)[0].substring(0, 4);
+                this.localStorage.push(item);
+            }
         }
         this.apiSubscription = this.panzoomConfig.api.subscribe((api: PanZoomAPI) => this.panZoomAPI = api);
         this.modelChangedSubscription = this.panzoomConfig.modelChanged.subscribe((model: PanZoomModel) => {
@@ -122,7 +121,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 .attr('is-handle', 'true')
                 .attr('class', 'dragCircle')
                 .attr('cursor', 'move')
-                .attr('onClick', 'console.log("test")')
                 .call(d3.drag()
                     .on('drag', function() {
                         holder.handleDrag(this);
@@ -139,7 +137,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public enableDragging() {
         const holder = this;
-        console.log(this.svg)
         this.svg.selectAll('.dragCircle').call(d3.drag()
         .on('drag', function() {
             holder.handleDrag(this);
@@ -192,7 +189,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public save(): void {
-        console.log();
         this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('circle').attr('opacity', 0);
         this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
