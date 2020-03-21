@@ -5,7 +5,6 @@ import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 import { Subscription, Observable } from 'rxjs';
 import * as cloneDeep from 'lodash.cloneDeep';
 
-
 @Component({
     selector: 'app-drawing-canvas',
     templateUrl: './drawing-canvas.component.html',
@@ -77,7 +76,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (this.dragging) { return; }
         this.drawing = true;
         this.startPoint = [e.offsetX, e.offsetY];
-        if (this.svg.select('g.drawPoly').empty()) { this.g = this.svg.append('g').attr('class', 'drawPoly'); }
+        if (this.svg.select('g.drawPoly').empty()) {
+            this.g = this.svg.append('g').attr('class', 'drawPoly');
+            this.svg.selectAll('circle').attr('cursor', 'default');
+        }
         if (e.toElement.tagName === 'circle') {
             this.closePolygon();
             return;
@@ -90,15 +92,17 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg.select('g.drawPoly').append('circle')
             .attr('cx', this.points[this.points.length - 1][0])
             .attr('cy', this.points[this.points.length - 1][1])
-            .attr('r', 4 / this.panzoomModel.zoomLevel)
+            .attr('r', 4 / (this.panzoomModel.zoomLevel / 1.5))
             .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel / 2))
             .attr('fill', 'yellow')
             .attr('stroke', '#000')
             .attr('is-handle', 'true')
+            .attr('class', 'inProgressCircle')
             .attr('style', 'cursor:pointer');
     }
     public closePolygon() {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
+        this.svg.selectAll('circle').attr('cursor', 'move');
         this.svg.select('g.drawPoly').remove();
         const g = this.svg.append('g').attr('class', this.color + ' completePoly').attr('layerHidden', 'false')
             .attr('opacity', this.opacity.nativeElement.value * .01);
@@ -147,19 +151,19 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public mouseMove(e) {
         if (!this.drawing) { return; }
         const g = d3.select('g.drawPoly');
-        if (e.target.tagName === 'circle') {
+        if (e.target.tagName === 'line') { return; }
+        if (e.target.className.baseVal === 'inProgressCircle') {
             g.select('line').remove();
-            return;
-        }
-        if (e.target.tagName !== 'svg') {
             return;
         }
         g.select('line').remove();
         g.append('line')
             .attr('x1', this.startPoint[0])
             .attr('y1', this.startPoint[1])
-            .attr('x2', e.offsetX)
-            .attr('y2', e.offsetY)
+            .attr('x2', (e.layerX - this.panzoomModel.pan.x) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
+            .attr('y2', (e.layerY - this.panzoomModel.pan.y) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
             .attr('stroke', '#53DBF3')
             .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel * 1.3));
     }
@@ -219,7 +223,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.svg.selectAll('circle').attr('r', 4 / (model.zoomLevel / 1.5));
             this.svg.selectAll('polyline').attr('stroke-width', 1 / (model.zoomLevel / 2));
             this.svg.selectAll('circle').attr('stroke-width', 1 / (model.zoomLevel / 2));
-
         }
     }
 
