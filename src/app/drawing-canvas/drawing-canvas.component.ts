@@ -4,7 +4,10 @@ import * as svg from 'save-svg-as-png';
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 import { Subscription, Observable } from 'rxjs';
 import * as cloneDeep from 'lodash.cloneDeep';
-
+import * as potrace from 'potrace';
+import * as Jimp from 'jimp';
+import { PngToSvgService } from '../services/png-to-svg.service';
+import { NgxUiLoaderService } from 'ngx-ui-loader';
 @Component({
     selector: 'app-drawing-canvas',
     templateUrl: './drawing-canvas.component.html',
@@ -18,6 +21,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public g;
     public isCollapsed = false;
     public points = [];
+    public loadedColors: number;
     public color = '#402020';
     public colorIndex = 0;
     public history = [];
@@ -37,6 +41,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     private apiSubscription: Subscription;
     private modelChangedSubscription: Subscription;
     public layers;
+    public loadedMask = false;
+    public layerPoints = [];
     public localStorage = [];
     @ViewChild('artboard') artboard;
     @ViewChild('opacity') opacity;
@@ -45,7 +51,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
 
-    constructor(private renderer: Renderer2) { }
+    constructor(private renderer: Renderer2, private pngToSvg: PngToSvgService, private ngxService: NgxUiLoaderService) { }
 
     ngOnInit(): void {
         const storage = Object.entries(localStorage);
@@ -65,6 +71,105 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg = d3.select('.artboard').append('svg')
             .attr('height', 950)
             .attr('width', 1250);
+    }
+
+    public createLayers() {
+        this.loadedColors = 0;
+        this.loadedMask = true;
+        this.drawing = false;
+        this.svg.selectAll('*').remove();
+        this.ngxService.start();
+        this.isolateSingleColor(2);
+        this.isolateSingleColor(0);
+        this.isolateSingleColor(1);
+        this.isolateSingleColor(3);
+        this.isolateSingleColor(4);
+    }
+
+
+    private isolateSingleColor(num: number) {
+        const colors = [[64, 32, 32], [255, 0, 0], [128, 128, 96], [0, 255, 102], [204, 0, 255]];
+        let image: any;
+        const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks');
+        const color = colors[num];
+        Jimp.read(maskUrl)
+            .then((jimpObject) => {
+                jimpObject.scan(0, 0, jimpObject.bitmap.width, jimpObject.bitmap.height, (x, y, idx) => {
+                    if (jimpObject.bitmap.data[idx] !== color[0] || jimpObject.bitmap.data[idx + 1] !== color[1]
+                        || jimpObject.bitmap.data[idx + 2] !== color[2]) {
+                        jimpObject.bitmap.data[idx] = 255;
+                        jimpObject.bitmap.data[idx + 1] = 255;
+                        jimpObject.bitmap.data[idx + 2] = 255;
+                    }
+                });
+                image = jimpObject;
+            }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
+
+                const trace = new potrace.Potrace({ optiCurve: false, alphaMax: 0.0, turdSize: 0 });
+
+                trace.loadImage(res, error => {
+                    this.addShape(trace.getSVG(), num);
+                });
+            }));
+    }
+
+    private addShape(shape: string, num: number) {
+        const parser = new DOMParser();
+        const doc: any = parser.parseFromString(shape, 'image/svg+xml');
+        const path = doc.children[0].children[0].getAttribute('d');
+        const points = this.pngToSvg.svgPathToPolygons(path, { tolerance: 100000, decimals: 8 });
+        let arrIndex = -1;
+        let arrIndex1 = 0;
+        const childPolys = [];
+        for (const poly of points) {
+            poly.forEach(element => {
+                element[0] += 43;
+                element[1] += 38;
+             });
+        }
+        for (const poly of points) {
+            arrIndex++;
+            for (const j of points) {
+                if (this.pngToSvg.pointInPoly(poly[0], j)  && (poly !== j)) { childPolys.push(arrIndex); break; }
+             }
+        }
+        for (const poly of points) {
+           this.points = poly;
+           this.changeColor(num);
+           if (childPolys.includes(arrIndex1)) {this.closePolygon(true); } else {
+            this.closePolygon();
+           }
+           arrIndex1++;
+           this.checkLoader();
+        }
+        this.arrangeShapes();
+    }
+
+    private checkLoader() {
+        if (this.loadedColors > 3) {
+            this.ngxService.stop();
+        } else {
+            this.loadedColors++;
+        }
+    }
+
+    private arrangeShapes() {
+        const polys = this.svg.selectAll('.child > polygon');
+        polys._groups[0].forEach(element => {
+        const points = element.getAttribute('points');
+        const layers = this.svg.selectAll('[points="' + points + '"]');
+        layers._groups.forEach(layer => {
+                if ( layer.length === 2) {
+                    for (const indiLayer of layer) {
+                        if (!indiLayer.parentElement.className.baseVal.includes('child')) {
+                            this.artboard.nativeElement.children[0].append(indiLayer.parentElement);
+                        } else {
+                            indiLayer.parentElement.remove();
+                        }
+                    }
+                }
+            });
+        });
     }
 
     public mouseUp(e) {
@@ -100,11 +205,15 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('class', 'inProgressCircle')
             .attr('style', 'cursor:pointer');
     }
-    public closePolygon() {
+    public closePolygon(childPoly?: boolean) {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
+        let child = '';
+        if (childPoly) {
+            child = ' child';
+        }
         this.svg.selectAll('circle').attr('cursor', 'move');
         this.svg.select('g.drawPoly').remove();
-        const g = this.svg.append('g').attr('class', this.color + ' completePoly').attr('layerHidden', 'false')
+        const g = this.svg.append('g').attr('class', this.color + ' completePoly' + child).attr('layerHidden', 'false')
             .attr('opacity', this.opacity.nativeElement.value * .01);
         g.append('polygon')
             .attr('points', this.points)
@@ -142,11 +251,11 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public enableDragging() {
         const holder = this;
         this.svg.selectAll('.dragCircle').call(d3.drag()
-        .on('drag', function() {
-            holder.handleDrag(this);
-        })
-        .on('end', () => { this.dragging = false; })
-    );
+            .on('drag', function() {
+                holder.handleDrag(this);
+            })
+            .on('end', () => { this.dragging = false; })
+        );
     }
     public mouseMove(e) {
         if (!this.drawing) { return; }
@@ -161,9 +270,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('x1', this.startPoint[0])
             .attr('y1', this.startPoint[1])
             .attr('x2', (e.layerX - this.panzoomModel.pan.x) *
-            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
+                (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
             .attr('y2', (e.layerY - this.panzoomModel.pan.y) *
-            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
+                (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)))
             .attr('stroke', '#53DBF3')
             .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel * 1.3));
     }
@@ -187,12 +296,11 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public updateOpacity(): void {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
-
         this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
-
     }
 
     public save(): void {
+        if (this.loadedMask === false) {
         this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('circle').attr('opacity', 0);
         this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
@@ -205,6 +313,45 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                     this.svg.selectAll('.background').remove();
                 }
             );
+        } else {
+            let image;
+            this.svg.selectAll('.completePoly').attr('opacity', 1);
+            this.svg.selectAll('circle').attr('opacity', 0);
+            this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#FFFFFF')
+                .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
+            svg.svgAsPngUri(this.artboard.nativeElement.children[0], { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 })
+            .then( uri => {
+                Jimp.read(uri).then((jimpObject) => {
+                jimpObject.scan(0, 0, jimpObject.bitmap.width, jimpObject.bitmap.height, (x, y, idx) => {
+                    if (jimpObject.bitmap.data[idx] === 255 && jimpObject.bitmap.data[idx + 1] === 255
+                        && jimpObject.bitmap.data[idx + 2] === 255) {
+
+                            let findColor = true;
+                            let findIndex = 0;
+                            while(findColor) {
+                                if (jimpObject.bitmap.data[idx + findIndex] === 255 && jimpObject.bitmap.data[idx + findIndex + 1] === 255
+                                    && jimpObject.bitmap.data[idx + findIndex + 2] === 255) {
+                                        findIndex += 4;
+                                    } else {
+                                        findColor = false;
+                                        jimpObject.bitmap.data[idx] = jimpObject.bitmap.data[idx + findIndex];
+                                        jimpObject.bitmap.data[idx + 1] = jimpObject.bitmap.data[idx + findIndex + 1];
+                                        jimpObject.bitmap.data[idx + 2] = jimpObject.bitmap.data[idx + findIndex + 2];
+                                    }
+                            }
+                    }
+                });
+                image = jimpObject;
+            }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
+                console.log(res);
+            }));
+                this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
+                this.svg.selectAll('circle').attr('opacity', 1);
+                this.svg.selectAll('.background').remove();
+                    }
+                );
+        }
+
     }
     public changeColor(id: number): void {
         const colors = ['#402020', '#ff0000', '#808060', '#00ff66', '#cc00ff'];
@@ -241,7 +388,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             artboard: JSON.stringify(collection),
             url: this.url.nativeElement.value,
             opacity: this.opacity.nativeElement.value
-        } );
+        });
         localStorage.setItem(this.url.nativeElement.value, contents);
     }
 

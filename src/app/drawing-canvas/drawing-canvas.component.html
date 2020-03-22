@@ -80,6 +80,13 @@
             <div *ngFor="let item of localStorage">
                 <span (click)="revertFromLocalStorage(item[1])">{{item[0]}}</span>
             </div>
+            <br>
+            <h5>Experimental:</h5>
+            <p>Warning! These features are experimental and contain bugs. Do not activate these any of these features when editing a mask you are not prepared to lose.<br>Report any bugs in <a target="_blank" href="https://github.com/erikbernheim/img-labeler/issues">Issues</a></p>
+            <br>
+            <h6>Load Existing Mask</h6>
+            <p>This will load an editable version of the mask associated with this image in the comma10k master repo. CPU intensive.</p>
+            <button type="button" class="btn btn-outline-primary" (click)="createLayers()">Load Existing Mask</button>
         </div>
     </div>
     <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
@@ -105,6 +112,7 @@
     </div>
     <button type="button" class="btn btn-outline-light" (click)="save()">Save</button>
     <button type="button" class="btn btn-outline-danger" (click)="reset()">Reset</button>
+
 
 
 </nav>
