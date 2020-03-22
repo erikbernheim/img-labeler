@@ -90,7 +90,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     private isolateSingleColor(num: number) {
         const colors = [[64, 32, 32], [255, 0, 0], [128, 128, 96], [0, 255, 102], [204, 0, 255]];
         let image: any;
-        const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks');
+        const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
+        .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/');
         const color = colors[num];
         Jimp.read(maskUrl)
             .then((jimpObject) => {
@@ -343,7 +344,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 });
                 image = jimpObject;
             }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
-                console.log(res);
+                const download = document.createElement('a');
+                download.href = res;
+                download.download = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0];
+                download.click();
             }));
                 this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
                 this.svg.selectAll('circle').attr('opacity', 1);
