@@ -181,7 +181,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (e.button !== 0) { return; }
         if (this.dragging) { return; }
         this.drawing = true;
-        this.startPoint = [e.offsetX, e.offsetY];
+        this.startPoint = [(e.layerX - this.panzoomModel.pan.x) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)),
+            (e.layerY - this.panzoomModel.pan.y) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth))];
         if (this.svg.select('g.drawPoly').empty()) {
             this.g = this.svg.append('g').attr('class', 'drawPoly');
             this.svg.selectAll('circle').attr('cursor', 'default');
@@ -190,7 +193,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.closePolygon();
             return;
         }
-        this.points.push([e.offsetX, e.offsetY]);
+        this.points.push([(e.layerX - this.panzoomModel.pan.x) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)),
+            (e.layerY - this.panzoomModel.pan.y) *
+            (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth))]);
         this.svg.select('g.drawPoly').append('polyline').attr('points', this.points)
             .style('fill', 'none')
             .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel / 2))
