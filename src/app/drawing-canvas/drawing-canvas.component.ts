@@ -71,6 +71,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg = d3.select('.artboard').append('svg')
             .attr('height', 950)
             .attr('width', 1250);
+
     }
 
     public createLayers() {
@@ -86,6 +87,18 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.isolateSingleColor(4);
     }
 
+    public addMask() {
+        const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
+        .attr('opacity', this.opacity.nativeElement.value * .01)
+        .attr('visibility', 'visible');
+        g.append('svg:image')
+        .attr('href', this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
+        .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/'))
+        .attr('x', 43)
+        .attr('y', 38);
+
+        this.layers = this.artboard.nativeElement.children[0].children;
+    }
 
     private isolateSingleColor(num: number) {
         const colors = [[64, 32, 32], [255, 0, 0], [128, 128, 96], [0, 255, 102], [204, 0, 255]];
@@ -170,6 +183,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                     }
                 }
             });
+        this.svg.selectAll('.child').remove();
         });
     }
 
@@ -221,7 +235,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg.selectAll('circle').attr('cursor', 'move');
         this.svg.select('g.drawPoly').remove();
         const g = this.svg.append('g').attr('class', this.color + ' completePoly' + child).attr('layerHidden', 'false')
-            .attr('opacity', this.opacity.nativeElement.value * .01);
+            .attr('opacity', this.opacity.nativeElement.value * .01)
+            .attr('visibility', 'visible');
         g.append('polygon')
             .attr('points', this.points)
             .attr('shape-rendering', 'crispEdges')
@@ -245,7 +260,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                     .on('drag', function() {
                         holder.handleDrag(this);
                     })
-                    .on('end', () => { this.dragging = false; })
+                    .on('end', () => {
+                        this.dragging = false;
+                        this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
+                    })
                 );
 
         }
@@ -261,7 +279,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .on('drag', function() {
                 holder.handleDrag(this);
             })
-            .on('end', () => { this.dragging = false; })
+            .on('end', () => {
+                this.dragging = false;
+                this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
+            })
         );
     }
     public mouseMove(e) {
@@ -285,7 +306,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public handleDrag(e) {
-        this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         if (this.drawing) { return; }
         const newPoints = [];
         let circle;
@@ -306,9 +326,19 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
     }
 
+    public incrementOpacity(up: boolean): void {
+        if (up) {
+            this.opacity.nativeElement.value =  Math.min(parseInt(this.opacity.nativeElement.value, 10) + 20, 100);
+        } else {
+            this.opacity.nativeElement.value =  Math.max(parseInt(this.opacity.nativeElement.value, 10) - 20, 0);
+        }
+        this.updateOpacity();
+    }
+
     public save(): void {
         if (this.loadedMask === false) {
         this.svg.selectAll('.completePoly').attr('opacity', 1);
+        this.svg.selectAll('.completePoly').attr('visibility', 'visible');
         this.svg.selectAll('circle').attr('opacity', 0);
         this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
             .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
@@ -323,6 +353,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         } else {
             let image;
             this.svg.selectAll('.completePoly').attr('opacity', 1);
+            this.svg.selectAll('.completePoly').attr('visibility', 'visible');
             this.svg.selectAll('circle').attr('opacity', 0);
             this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#FFFFFF')
                 .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
@@ -346,7 +377,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                                         jimpObject.bitmap.data[idx + 2] = jimpObject.bitmap.data[idx + findIndex + 2];
                                     }
                             }
-                    }
+                     }
                 });
                 image = jimpObject;
             }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
@@ -434,19 +465,19 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public toggleVisibility(i: number) {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') !== '0') {
-            this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', '0');
+        if (this.artboard.nativeElement.children[0].children[i].getAttribute('visibility') !== 'hidden') {
+            this.artboard.nativeElement.children[0].children[i].setAttribute('visibility', 'hidden');
             this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'true');
             return;
         }
 
-        this.artboard.nativeElement.children[0].children[i].setAttribute('opacity', this.opacity.nativeElement.value * .01);
+        this.artboard.nativeElement.children[0].children[i].setAttribute('visibility', 'visible');
         this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'false');
 
     }
 
     public getVisibility(i: number): boolean {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('opacity') !== '0') {
+        if (this.artboard.nativeElement.children[0].children[i].getAttribute('visibility') === 'visible') {
             return true;
         }
         return false;
@@ -472,13 +503,15 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (event.code === 'KeyM') { this.changeColor(3); }
         if (event.code === 'KeyC') { this.changeColor(4); }
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
+        if (event.code === 'ArrowUp') { this.incrementOpacity(true); event.preventDefault(); }
+        if (event.code === 'ArrowDown') { this.incrementOpacity(false); event.preventDefault(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
     }
 
     public getLayerType(i: number): string {
 
         const colors = [['#402020 completePoly', 'Road'], ['#ff0000 completePoly', 'Lane Markings'], ['#808060 completePoly', 'Undrivable'],
-        ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car']];
+        ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car'], ['existingMask completePoly', 'Existing Mask']];
         for (const color of colors) {
             if (color[0] === this.artboard.nativeElement.children[0].children[i].getAttribute('class')) {
                 return color[1];
