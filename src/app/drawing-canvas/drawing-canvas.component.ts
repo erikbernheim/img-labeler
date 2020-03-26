@@ -118,7 +118,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 });
                 image = jimpObject;
             }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
-
                 const trace = new potrace.Potrace({ optiCurve: false, alphaMax: 0.0, turdSize: 0 });
 
                 trace.loadImage(res, error => {
@@ -154,13 +153,13 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.closePolygon();
            }
            arrIndex1++;
-           this.checkLoader();
         }
-        this.arrangeShapes();
+        this.checkLoader();
     }
 
     private checkLoader() {
         if (this.loadedColors > 3) {
+            this.arrangeShapes();
             this.ngxService.stop();
         } else {
             this.loadedColors++;
@@ -183,8 +182,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                     }
                 }
             });
-        this.svg.selectAll('.child').remove();
         });
+        this.svg.selectAll('.child').remove();
     }
 
     public mouseUp(e) {
@@ -336,6 +335,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public save(): void {
+        let holder = this;
         if (this.loadedMask === false) {
         this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('.completePoly').attr('visibility', 'visible');
@@ -351,48 +351,32 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 }
             );
         } else {
-            let image;
+            const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
+        .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/');
             this.svg.selectAll('.completePoly').attr('opacity', 1);
             this.svg.selectAll('.completePoly').attr('visibility', 'visible');
             this.svg.selectAll('circle').attr('opacity', 0);
-            this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#FFFFFF')
-                .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
             svg.svgAsPngUri(this.artboard.nativeElement.children[0], { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 })
             .then( uri => {
-                Jimp.read(uri).then((jimpObject) => {
-                jimpObject.scan(0, 0, jimpObject.bitmap.width, jimpObject.bitmap.height, (x, y, idx) => {
-                    if (jimpObject.bitmap.data[idx] === 255 && jimpObject.bitmap.data[idx + 1] === 255
-                        && jimpObject.bitmap.data[idx + 2] === 255) {
-
-                            let findColor = true;
-                            let findIndex = 0;
-                            while(findColor) {
-                                if (jimpObject.bitmap.data[idx + findIndex] === 255 && jimpObject.bitmap.data[idx + findIndex + 1] === 255
-                                    && jimpObject.bitmap.data[idx + findIndex + 2] === 255) {
-                                        findIndex += 4;
-                                    } else {
-                                        findColor = false;
-                                        jimpObject.bitmap.data[idx] = jimpObject.bitmap.data[idx + findIndex];
-                                        jimpObject.bitmap.data[idx + 1] = jimpObject.bitmap.data[idx + findIndex + 1];
-                                        jimpObject.bitmap.data[idx + 2] = jimpObject.bitmap.data[idx + findIndex + 2];
-                                    }
-                            }
-                     }
+                Jimp.read(maskUrl, (err, originalMask) => {
+                    Jimp.read(uri, (err, image) => {
+                        originalMask.composite( image, 0, 0 );
+                        holder.downloadImage(originalMask);
+                    });
                 });
-                image = jimpObject;
-            }).then(i => image.getBase64(Jimp.AUTO, (err, res) => {
-                const download = document.createElement('a');
-                download.href = res;
-                download.download = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0];
-                download.click();
-            }));
                 this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
                 this.svg.selectAll('circle').attr('opacity', 1);
-                this.svg.selectAll('.background').remove();
                     }
                 );
         }
-
+    }
+    public downloadImage(image){
+        image.getBase64(Jimp.AUTO, (err, res) => {
+            const download = document.createElement('a');
+            download.href = res;
+            download.download = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0];
+            download.click();
+        });
     }
     public changeColor(id: number): void {
         const colors = ['#402020', '#ff0000', '#808060', '#00ff66', '#cc00ff'];
