@@ -88,6 +88,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public addMask() {
+        this.loadedMask = true;
         const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
         .attr('opacity', this.opacity.nativeElement.value * .01)
         .attr('visibility', 'visible');
@@ -468,7 +469,17 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public deleteLayer(i: number) {
+        if (this.getLayerType(i) === 'Existing Mask') {
+            this.loadedMask = false;
+        }
         this.artboard.nativeElement.children[0].children[i].remove();
+    }
+
+    public deleteAllLayers() {
+        if (this.drawing) { return; }
+        if (confirm('Warning: This will remove all current layers')) {
+        this.svg.selectAll('g').remove();
+        }
     }
 
     public deleteCurrentLayer() {

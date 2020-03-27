@@ -35,13 +35,22 @@
         <button class="btn btn-outline-light" id="dropdownBasic1" ngbDropdownToggle>Layers</button>
         <div ngbDropdownMenu aria-labelledby="dropdownBasic1" style="overflow:auto; max-height: 600px; width:600px;"
             class="bg-dark">
-            <div class="input-group ml-2 mt-1 mb-2" style="width:250px">
-                <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
+            <div class="row" style="max-width: 100%">
+                <div class="col">
+                    <div class="input-group mt-1 mb-2" style="width:250px">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="basic-addon1">Mask Opacity</span>
+                        </div>
+                        <input type="number" class="form-control" min="0" max="100" value='100' #opacity
+                            aria-describedby="basic-addon1" (input)="updateOpacity()">
+                    </div>
                 </div>
-                <input type="number" class="form-control" min="0" max="100" value='100' #opacity aria-describedby="basic-addon1"
-                    (input)="updateOpacity()">
+                <div class="col" style="text-align:right"> <button type="button" class="btn btn-outline-danger" (click)="deleteAllLayers()">Clear
+                        All Layers</button>
+                </div>
+
             </div>
+
             <table class="table table-striped table-dark" *ngIf="layers">
                 <thead>
                     <tr>
@@ -75,21 +84,27 @@
     </div>
     <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
         <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle>Advanced</button>
-        <div ngbDropdownMenu aria-labelledby="dropdownBasic3" style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px" class="bg-dark">
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic3"
+            style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px"
+            class="bg-dark">
             <h5>Revert From History</h5>
             <div *ngFor="let item of localStorage">
                 <span (click)="revertFromLocalStorage(item[1])">{{item[0]}}</span>
             </div>
             <br>
             <h5>Experimental:</h5>
-            <p>Warning! These features are experimental and contain bugs. Do not activate these any of these features when editing a mask you are not prepared to lose.<br>Report any bugs in <a target="_blank" href="https://github.com/erikbernheim/img-labeler/issues">Issues</a></p>
+            <p>Warning! These features are experimental and contain bugs. Do not activate these any of these features
+                when editing a mask you are not prepared to lose.<br>Report any bugs in <a target="_blank"
+                    href="https://github.com/erikbernheim/img-labeler/issues">Issues</a></p>
             <br>
             <h6>Load Existing Mask</h6>
-            <p>This will load an editable version of the mask associated with this image in the comma10k master repo. CPU intensive.</p>
+            <p>This will load an editable version of the mask associated with this image in the comma10k master repo.
+                CPU intensive.</p>
             <button type="button" class="btn btn-outline-primary" (click)="createLayers()">Load Existing Mask</button>
             <br><br>
             <h6>Show Existing Mask</h6>
-            <p>This will load a non-editable version of the mask associated with this image in the comma10k master repo.</p>
+            <p>This will load a non-editable version of the mask associated with this image in the comma10k master repo.
+            </p>
             <button type="button" class="btn btn-outline-primary" (click)="addMask()">Show Existing Mask</button>
         </div>
     </div>
