@@ -521,4 +521,21 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         }
     }
 
+    public loadMaskFromURL(): void {
+        const maskUrl =  prompt('Enter Mask URL').valueOf().replace('imgs', 'masks').replace('?raw=true', '')
+        .replace('https://github.com', 'https://raw.githubusercontent.com').replace('/blob', '');
+        this.loadedMask = true;
+        const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
+        .attr('opacity', this.opacity.nativeElement.value * .01)
+        .attr('visibility', 'visible');
+        g.append('svg:image')
+        .attr('href', maskUrl)
+        .attr('x', 43)
+        .attr('y', 38);
+        this.url.nativeElement.value = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/' +
+        maskUrl.match(/[\w-]+\.(png|jpg)/)[0];
+        this.layers = this.artboard.nativeElement.children[0].children;
+        this.updateImage();
+    }
+
 }
