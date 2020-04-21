@@ -8,6 +8,7 @@ import * as potrace from 'potrace';
 import * as Jimp from 'jimp';
 import { PngToSvgService } from '../services/png-to-svg.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { LutServiceService } from '../services/lut-service.service';
 @Component({
     selector: 'app-drawing-canvas',
     templateUrl: './drawing-canvas.component.html',
@@ -46,12 +47,15 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public localStorage = [];
     @ViewChild('artboard') artboard;
     @ViewChild('opacity') opacity;
+    @ViewChild('imageNumber') imageNumber;
     @ViewChild('url') url;
+
     ngAfterViewInit(): void {
     }
 
 
-    constructor(private renderer: Renderer2, private pngToSvg: PngToSvgService, private ngxService: NgxUiLoaderService) { }
+    constructor(private renderer: Renderer2, private pngToSvg: PngToSvgService,
+    private ngxService: NgxUiLoaderService, private lut: LutServiceService) { }
 
     ngOnInit(): void {
         const storage = Object.entries(localStorage);
@@ -388,7 +392,14 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public updateImage(url?): void {
         if (url) { this.svg.style('background-image', `url('${url}')`); } else {
             this.svg.style('background-image', `url('${this.url.nativeElement.value}')`);
+            this.imageNumber.nativeElement.value = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0].substring(0, 4);
         }
+    }
+
+    public updateImageByNumber(): void{
+        console.log(parseInt(this.imageNumber.nativeElement.value))
+        this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value)}')`);
+        this.url.nativeElement.value = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(parseInt(this.imageNumber.nativeElement.value))}`;
     }
 
     onModelChanged(model: PanZoomModel): void {
