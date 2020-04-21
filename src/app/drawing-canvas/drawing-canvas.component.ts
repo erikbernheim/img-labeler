@@ -93,6 +93,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public addMask() {
         this.loadedMask = true;
+        this.svg.selectAll('g.existingMask').remove();
         const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
         .attr('opacity', this.opacity.nativeElement.value * .01)
         .attr('visibility', 'visible');
@@ -101,7 +102,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/'))
         .attr('x', 43)
         .attr('y', 38);
-
+        this.updateOpacity(50)
         this.layers = this.artboard.nativeElement.children[0].children;
     }
 
@@ -325,9 +326,13 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         poly.attr('points', newPoints);
     }
 
-    public updateOpacity(): void {
+    public updateOpacity(val?: number): void {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
+        if(val){
+            this.svg.selectAll('.completePoly').attr('opacity', val * .01); 
+            this.opacity.nativeElement.value = val;
+        }
     }
 
     public incrementOpacity(up: boolean): void {
