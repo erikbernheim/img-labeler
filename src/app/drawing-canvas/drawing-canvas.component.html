@@ -32,7 +32,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Image Number</span>
                 </div>
-                <input type="number" class="form-control" min="0" max="1999" value='5' #imageNumber
+                <input type="text" class="form-control" maxlength="4" value='0005' #imageNumber
                             aria-describedby="basic-addon1">
                             <div class="btn btn-outline-primary ml-1" (click)="updateImageByNumber()">Go</div>
             </div>

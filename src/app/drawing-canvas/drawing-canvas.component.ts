@@ -403,8 +403,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public updateImageByNumber(): void{
         console.log(parseInt(this.imageNumber.nativeElement.value))
-        this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value)}')`);
-        this.url.nativeElement.value = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(parseInt(this.imageNumber.nativeElement.value))}`;
+        this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}')`);
+        this.url.nativeElement.value = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}`;
+        this.imageNumber.nativeElement.value = this.imageNumber.nativeElement.value.padStart(4, '0')
     }
 
     onModelChanged(model: PanZoomModel): void {
