@@ -472,10 +472,22 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'true');
             return;
         }
-
         this.artboard.nativeElement.children[0].children[i].setAttribute('visibility', 'visible');
         this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'false');
+    }
 
+    public toggleAll(): void {
+        if (this.getVisibility(0)) {
+            for (let layer of this.layers) {
+                layer.setAttribute('visibility', 'hidden');
+                layer.setAttribute('layerHidden', 'true')
+            }
+        } else {
+            for (let layer of this.layers) {
+                layer.setAttribute('visibility', 'visible');
+                layer.setAttribute('layerHidden', 'false')
+            }
+        }
     }
 
     public getVisibility(i: number): boolean {
@@ -518,6 +530,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (event.code === 'ArrowUp') { this.incrementOpacity(true); event.preventDefault(); }
         if (event.code === 'ArrowDown') { this.incrementOpacity(false); event.preventDefault(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
+        if (event.code === 'Comma') { this.toggleAll  (); }
+
     }
 
     public getLayerType(i: number): string {
