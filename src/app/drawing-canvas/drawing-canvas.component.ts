@@ -27,6 +27,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public colorIndex = 0;
     public history = [];
     public providedURL: string;
+    public customMaskURL: string;
     public panzoomConfig: PanZoomConfig = new PanZoomConfig({
         zoomLevels: 10,
         scalePerZoomLevel: 1.5,
@@ -361,8 +362,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 }
             );
         } else {
-            const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
-        .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/');
+            let maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
+            .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/');
+            if (this.customMaskURL) { maskUrl = this.customMaskURL; }
             this.svg.selectAll('.completePoly').attr('opacity', 1);
             this.svg.selectAll('.completePoly').attr('visibility', 'visible');
             this.svg.selectAll('circle').attr('opacity', 0);
@@ -553,18 +555,18 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public loadMaskFromURL(): void {
-        const maskUrl =  prompt('Enter Mask URL').valueOf().replace('imgs', 'masks').replace('?raw=true', '')
+        this.customMaskURL =  prompt('Enter Mask URL').valueOf().replace('imgs', 'masks').replace('?raw=true', '')
         .replace('https://github.com', 'https://raw.githubusercontent.com').replace('/blob', '');
         this.loadedMask = true;
         const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
         .attr('opacity', this.opacity.nativeElement.value * .01)
         .attr('visibility', 'visible');
         g.append('svg:image')
-        .attr('href', maskUrl)
+        .attr('href', this.customMaskURL)
         .attr('x', 43)
         .attr('y', 38);
         this.url.nativeElement.value = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/' +
-        maskUrl.match(/[\w-]+\.(png|jpg)/)[0];
+        this.customMaskURL.match(/[\w-]+\.(png|jpg)/)[0];
         this.layers = this.artboard.nativeElement.children[0].children;
         this.updateImage();
     }
