@@ -97,6 +97,7 @@
         <div ngbDropdownMenu aria-labelledby="dropdownBasic3"
             style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px"
             class="bg-dark">
+            <app-git-manage [gitImage]="gitImage" [imageName]="imageName" (getImage)="base64ToGit()"></app-git-manage>
             <h5>Revert From History</h5>
             <div *ngFor="let item of localStorage">
                 <span (click)="revertFromLocalStorage(item[1])">{{item[0]}}</span>

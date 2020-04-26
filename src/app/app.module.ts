@@ -7,6 +7,9 @@ import { CanvasMapComponent } from './canvas-map/canvas-map.component';
 import { Ng2PanZoomModule } from 'ng2-panzoom';
 import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 import { NgxUiLoaderModule } from 'ngx-ui-loader';
+import { GitComponent } from './git/git.component';
+import { HttpClientModule } from '@angular/common/http';
+import { GitManageComponent } from './git-manage/git-manage.component';
 
 
 
@@ -14,14 +17,17 @@ import { NgxUiLoaderModule } from 'ngx-ui-loader';
   declarations: [
     AppComponent,
     DrawingCanvasComponent,
-    CanvasMapComponent
+    CanvasMapComponent,
+    GitComponent,
+    GitManageComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     Ng2PanZoomModule,
     NgbModule,
-    NgxUiLoaderModule
+    NgxUiLoaderModule,
+    HttpClientModule
     ],
   providers: [],
   bootstrap: [AppComponent]

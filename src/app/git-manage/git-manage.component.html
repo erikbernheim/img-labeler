@@ -1,0 +1,24 @@
+<h5>Github Integration</h5>
+
+<button *ngIf="!authenticated" type="button" class="btn btn-sm btn-outline-primary" (click)="githubAuthenticate()">Log In</button>
+<button *ngIf="authenticated" type="button" class="btn btn-sm btn-outline-primary" (click)="gitLoad()">Reload</button>
+<button *ngIf="authenticated" type="button" class="btn btn-sm btn-outline-primary ml-2" (click)="logout()">Log Out</button>
+
+<div *ngIf="authenticated" class="mt-2">
+    Welcome: {{userData.login}}<br>
+    <table class="table table-striped table-dark table-sm">
+        <thead>
+        <tr>
+            <td>Branch Name</td>
+            <td></td>
+        </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let branch of branches">
+        
+        <td>{{branch.name}}</td><td><button type="button" class="btn btn-outline-primary btn-sm" (click)="commit(branch.commit.sha, branch.name)">Commit</button></td>
+        </tr>
+</tbody>
+</table>
+<div class="alert alert-success" *ngIf="commitReturn">Successfully committed mask</div>
+</div>

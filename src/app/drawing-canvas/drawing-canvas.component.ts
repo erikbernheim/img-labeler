@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Renderer2, HostListener, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, Renderer2, HostListener, AfterViewInit, Output } from '@angular/core';
 import * as d3 from 'd3';
 import * as svg from 'save-svg-as-png';
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
@@ -9,12 +9,15 @@ import * as Jimp from 'jimp';
 import { PngToSvgService } from '../services/png-to-svg.service';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
 import { LutServiceService } from '../services/lut-service.service';
+import { ActivatedRoute } from '@angular/router';
 @Component({
     selector: 'app-drawing-canvas',
     templateUrl: './drawing-canvas.component.html',
     styleUrls: ['./drawing-canvas.component.css']
 })
 export class DrawingCanvasComponent implements OnInit, AfterViewInit {
+    public gitImage: string;
+    public imageName: string;
     public dragging = false;
     public drawing = false;
     public startPoint = [];
@@ -56,7 +59,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
 
     constructor(private renderer: Renderer2, private pngToSvg: PngToSvgService,
-    private ngxService: NgxUiLoaderService, private lut: LutServiceService) { }
+                private ngxService: NgxUiLoaderService, private lut: LutServiceService,
+                private activatedRoute: ActivatedRoute) { }
 
     ngOnInit(): void {
         const storage = Object.entries(localStorage);
@@ -77,6 +81,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('height', 950)
             .attr('width', 1250);
 
+        this.activatedRoute.queryParams.subscribe(params => {
+                const userId = params.userId;
+              });
     }
 
     public createLayers() {
@@ -103,7 +110,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/'))
         .attr('x', 43)
         .attr('y', 38);
-        this.updateOpacity(50)
+        this.updateOpacity(50);
         this.layers = this.artboard.nativeElement.children[0].children;
     }
 
@@ -330,8 +337,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public updateOpacity(val?: number): void {
         this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
-        if(val){
-            this.svg.selectAll('.completePoly').attr('opacity', val * .01); 
+        if (val) {
+            this.svg.selectAll('.completePoly').attr('opacity', val * .01);
             this.opacity.nativeElement.value = val;
         }
     }
@@ -346,7 +353,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public save(): void {
-        let holder = this;
+        const holder = this;
         if (this.loadedMask === false) {
         this.svg.selectAll('.completePoly').attr('opacity', 1);
         this.svg.selectAll('.completePoly').attr('visibility', 'visible');
@@ -382,12 +389,59 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 );
         }
     }
-    public downloadImage(image){
+
+    public base64ToGit(): void {
+        const holder = this;
+        this.imageName = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0];
+        if (this.loadedMask === false) {
+        this.svg.selectAll('.completePoly').attr('opacity', 1);
+        this.svg.selectAll('.completePoly').attr('visibility', 'visible');
+        this.svg.selectAll('circle').attr('opacity', 0);
+        this.svg.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
+            .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
+        svg.svgAsPngUri(this.artboard.nativeElement.children[0],
+            { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 }).then(
+                (image) => {
+                    this.gitImage = image;
+                    this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
+                    this.svg.selectAll('circle').attr('opacity', 1);
+                    this.svg.selectAll('.background').remove();
+                }
+            );
+        } else {
+            let maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
+            .replace('https://github.com/commaai/comma10k/blob/', 'https://raw.githubusercontent.com/commaai/comma10k/');
+            if (this.customMaskURL) { maskUrl = this.customMaskURL; }
+            this.svg.selectAll('.completePoly').attr('opacity', 1);
+            this.svg.selectAll('.completePoly').attr('visibility', 'visible');
+            this.svg.selectAll('circle').attr('opacity', 0);
+            svg.svgAsPngUri(this.artboard.nativeElement.children[0], { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 })
+            .then( uri => {
+                Jimp.read(maskUrl, (err, originalMask) => {
+                    Jimp.read(uri, (err, image) => {
+                        originalMask.composite( image, 0, 0 );
+                        holder.setBase64(originalMask);
+                    });
+                });
+                this.svg.selectAll('.completePoly').attr('opacity', this.opacity.nativeElement.value * .01);
+                this.svg.selectAll('circle').attr('opacity', 1);
+                    }
+                );
+        }
+    }
+
+    public downloadImage(image) {
         image.getBase64(Jimp.AUTO, (err, res) => {
             const download = document.createElement('a');
             download.href = res;
             download.download = this.url.nativeElement.value.match(/[\w-]+\.(png|jpg)/)[0];
             download.click();
+        });
+    }
+
+    public setBase64(image) {
+        image.getBase64(Jimp.AUTO, (err, res) => {
+            this.gitImage = res;
         });
     }
     public changeColor(id: number): void {
@@ -403,11 +457,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         }
     }
 
-    public updateImageByNumber(): void{
-        console.log(parseInt(this.imageNumber.nativeElement.value))
+    public updateImageByNumber(): void {
         this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}')`);
         this.url.nativeElement.value = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}`;
-        this.imageNumber.nativeElement.value = this.imageNumber.nativeElement.value.padStart(4, '0')
+        this.imageNumber.nativeElement.value = this.imageNumber.nativeElement.value.padStart(4, '0');
     }
 
     onModelChanged(model: PanZoomModel): void {
@@ -480,14 +533,14 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public toggleAll(): void {
         if (this.getVisibility(0)) {
-            for (let layer of this.layers) {
+            for (const layer of this.layers) {
                 layer.setAttribute('visibility', 'hidden');
-                layer.setAttribute('layerHidden', 'true')
+                layer.setAttribute('layerHidden', 'true');
             }
         } else {
-            for (let layer of this.layers) {
+            for (const layer of this.layers) {
                 layer.setAttribute('visibility', 'visible');
-                layer.setAttribute('layerHidden', 'false')
+                layer.setAttribute('layerHidden', 'false');
             }
         }
     }
