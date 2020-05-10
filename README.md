@@ -44,6 +44,5 @@ git clone img-labeler
 cd img-labeler
 npm install
 ng build --prod
-# to add a new package, npm i --save lodash.cloneDeep
 ng serve
 
