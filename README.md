@@ -38,3 +38,12 @@ Step 5: Create a Pull Request (this will ask comma guys to check your images etc
 Report any issues in GitHub issues for this repo or in Discord.
 
 Any git questions can usually be answered on StackOverflow.
+
+### to develop locally
+git clone img-labeler
+cd img-labeler
+npm install
+ng build --prod
+# to add a new package, npm i --save lodash.cloneDeep
+ng serve
+

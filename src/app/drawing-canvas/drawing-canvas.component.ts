@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import * as svg from 'save-svg-as-png';
 import { PanZoomConfig, PanZoomAPI, PanZoomModel } from 'ng2-panzoom';
 import { Subscription, Observable } from 'rxjs';
-import * as cloneDeep from 'lodash.cloneDeep';
+import * as clonedeep from 'lodash.clonedeep';
 import * as potrace from 'potrace';
 import * as Jimp from 'jimp';
 import { PngToSvgService } from '../services/png-to-svg.service';
@@ -474,7 +474,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public addToHistory(drawing, startPoint, g, points): void {
         const collection = this.artboard.nativeElement.children[0].innerHTML;
         this.history.unshift([JSON.stringify(collection), JSON.stringify(drawing),
-        JSON.stringify(startPoint), cloneDeep(g), JSON.stringify(points)]);
+        JSON.stringify(startPoint), clonedeep(g), JSON.stringify(points)]);
         if (this.history.length > 15) {
             this.history.pop();
         }
