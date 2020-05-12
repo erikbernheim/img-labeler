@@ -24,7 +24,7 @@
                     <span class="input-group-text" id="basic-addon1">Image URL</span>
                 </div>
                 <input type="text" class="form-control"
-                    value='https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png'
+                    value={{imgURL}}
                     #url aria-describedby="basic-addon1" (input)="updateImage()">
             </div>
 
@@ -32,7 +32,7 @@
                 <div class="input-group-prepend">
                     <span class="input-group-text" id="basic-addon1">Image Number</span>
                 </div>
-                <input type="text" class="form-control" maxlength="4" value='0005' #imageNumber
+                <input type="text" class="form-control" maxlength="4" value={{imgN}} #imageNumber
                             aria-describedby="basic-addon1">
                             <div class="btn btn-outline-primary ml-1" (click)="updateImageByNumber()">Go</div>
             </div>

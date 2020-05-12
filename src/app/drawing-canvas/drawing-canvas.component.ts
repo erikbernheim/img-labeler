@@ -49,6 +49,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public loadedMask = false;
     public layerPoints = [];
     public localStorage = [];
+    public imgN = '5';
+    public imgURL = 'https://raw.githubusercontent.com/commaai/comma10k/master/imgs/0005_836d09212ac1b8fa_2018-06-15--15-57-15_23_345.png';
     @ViewChild('artboard') artboard;
     @ViewChild('opacity') opacity;
     @ViewChild('imageNumber') imageNumber;
@@ -83,6 +85,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
         this.activatedRoute.queryParams.subscribe(params => {
                 const userId = params.userId;
+                if (params.imageNumber){
+                    this.imgN = params.imageNumber;
+                    this.updateImageByN();
+                }
               });
     }
 
@@ -115,6 +121,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     private isolateSingleColor(num: number) {
+        // 0 undrivable, 1 lane, 2 road, 3 movable , 4 mycar
         const colors = [[64, 32, 32], [255, 0, 0], [128, 128, 96], [0, 255, 102], [204, 0, 255]];
         let image: any;
         const maskUrl = this.url.nativeElement.value.replace('imgs', 'masks').replace('?raw=true', '')
@@ -457,10 +464,15 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         }
     }
 
+    private updateImageByN(): void {
+        this.imgN = this.imgN.padStart(4, '0');
+        this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imgN)}')`);
+        this.imgURL = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imgN)}`;
+    }
+
     public updateImageByNumber(): void {
-        this.svg.style('background-image', `url('https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}')`);
-        this.url.nativeElement.value = `https://raw.githubusercontent.com/commaai/comma10k/master/imgs/${this.lut.getUrl(this.imageNumber.nativeElement.value.padStart(4, '0'))}`;
-        this.imageNumber.nativeElement.value = this.imageNumber.nativeElement.value.padStart(4, '0');
+        this.imgN = this.imageNumber.nativeElement.value;
+        this.updateImageByN();
     }
 
     onModelChanged(model: PanZoomModel): void {
