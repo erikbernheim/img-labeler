@@ -2,6 +2,8 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { GitService } from '../git.service';
 import { switchMap } from 'rxjs/operators';
 import { NgxUiLoaderService } from 'ngx-ui-loader';
+import { MaskingService } from '../services/masking.service';
+import { SvgtopngService } from '../services/svgtopng.service';
 
 @Component({
   selector: 'app-git-manage',
@@ -10,15 +12,14 @@ import { NgxUiLoaderService } from 'ngx-ui-loader';
 })
 export class GitManageComponent implements OnInit {
 
-  constructor(private git: GitService, private ngxService: NgxUiLoaderService) { }
+  constructor(private git: GitService, private ngxService: NgxUiLoaderService,
+  private maskSvc: MaskingService, private svgToPng: SvgtopngService) { }
   public authenticated = false;
   public errorOccurred = false;
   public userData;
   public branches;
   public commitReturn: boolean = false;
-  @Output() getImage = new EventEmitter<boolean>();
-  @Input() gitImage: string;
-  @Input() imageName: string;
+
   ngOnInit(): void {
     if(localStorage.getItem('gitToken') && localStorage.getItem('gitToken') != 'ERROR'){
       this.gitLoad();
@@ -29,13 +30,11 @@ export class GitManageComponent implements OnInit {
     this.commitReturn = false;
     this.git.getUserInfo().pipe(
       switchMap( ret => {
-        console.log(ret);
         this.userData = ret;
         return this.git.getRepoBranches(ret.login);
       })
     )
   .subscribe((ret) => {
-    console.log(ret);
     this.branches = ret;
     this.authenticated = true;
   },
@@ -66,31 +65,27 @@ export class GitManageComponent implements OnInit {
   }
 
   public commit(sha: string, branch: string): void {
-    this.getImage.emit(true);
+    let imgUrl = this.maskSvc.currentUrl.match(/[\w-]+\.png/)[0];
+    this.svgToPng.base64ToGit()
+    .then(base64 => {
+      console.log(base64)
     this.ngxService.start();
-    setTimeout(() => {
-    const commitMessage =  prompt('Enter Commit Message', `${this.imageName.substr(0, 4)} ${this.userData.login}`).valueOf();
-    console.log(this.gitImage);
-    console.log(this.imageName);
+    const commitMessage =  prompt('Enter Commit Message', `${imgUrl.substr(0, 4)} ${this.userData.login}`).valueOf();
     this.git.getTree(this.userData.login, sha).pipe(
       switchMap(ret => {
-        console.log(ret.tree);
-        console.log(ret.tree.filter(item => item.path === 'masks')[0]);
         return this.git.getTree(this.userData.login, ret.tree.filter(item => item.path === 'masks')[0].sha);
       })
     )
     .pipe(
       switchMap(ret => {
-      console.log(ret.tree.filter(mask => mask.path === this.imageName)[0].sha);
-      return this.git.commitFile(this.userData.login, commitMessage, this.gitImage.replace('data:image/png;base64,', ''),
-          ret.tree.filter(mask => mask.path === this.imageName)[0].sha, branch, this.imageName);
+      return this.git.commitFile(this.userData.login, commitMessage, base64.replace('data:image/png;base64,', ''),
+          ret.tree.filter(mask => mask.path === imgUrl)[0].sha, branch, imgUrl);
       })
     ).subscribe(ret => {
-      console.log(ret);
       this.commitReturn = true;
       this.ngxService.stop();
     });
-  }, 750);
+    });
   }
 
 }

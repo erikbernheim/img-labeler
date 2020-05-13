@@ -15,7 +15,6 @@ export class CanvasMapComponent implements OnInit {
   }
 
   click(e): void{
-    console.log(e);
     let ctx = this.canvas.nativeElement.getContext('2d');
     ctx.fillRect(e.offsetX,e.offsetY,10,10);
     this.points.push([e.offsetX, e.offsetY]);

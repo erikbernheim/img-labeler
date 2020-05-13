@@ -1,0 +1,1 @@
+<button *ngFor="let color of colors index as i" class="btn btn-dark ml-2" type="button" [ngStyle]="{'border-color': color.color, 'background-color': color.color, 'text-decoration': this.maskSvc.currentColor.color === color.color ? 'underline' : 'none'}" (click)="setColor(i)">{{color.name}}</button>

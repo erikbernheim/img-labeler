@@ -10,6 +10,11 @@ import { NgxUiLoaderModule } from 'ngx-ui-loader';
 import { GitComponent } from './git/git.component';
 import { HttpClientModule } from '@angular/common/http';
 import { GitManageComponent } from './git-manage/git-manage.component';
+import { ToolbarComponent } from './toolbar/toolbar.component';
+import { ToolbarColorSelectorComponent } from './toolbar-color-selector/toolbar-color-selector.component';
+import { ImageSelectorComponent } from './image-selector/image-selector.component';
+import { LayersComponent } from './layers/layers.component';
+import { RevertFromHistoryComponent } from './revert-from-history/revert-from-history.component';
 
 
 
@@ -19,7 +24,12 @@ import { GitManageComponent } from './git-manage/git-manage.component';
     DrawingCanvasComponent,
     CanvasMapComponent,
     GitComponent,
-    GitManageComponent
+    GitManageComponent,
+    ToolbarComponent,
+    ToolbarColorSelectorComponent,
+    ImageSelectorComponent,
+    LayersComponent,
+    RevertFromHistoryComponent
   ],
   imports: [
     BrowserModule,
@@ -27,7 +37,7 @@ import { GitManageComponent } from './git-manage/git-manage.component';
     Ng2PanZoomModule,
     NgbModule,
     NgxUiLoaderModule,
-    HttpClientModule
+    HttpClientModule,
     ],
   providers: [],
   bootstrap: [AppComponent]

@@ -1,0 +1,54 @@
+<nav class="navbar navbar-dark bg-dark">
+    <a class="navbar-brand">Image Labeler</a>
+<app-toolbar-color-selector></app-toolbar-color-selector>
+
+    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
+        <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle>Image URL</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic3" style="overflow:auto; max-height: 600px;" class="bg-dark">
+            <app-image-selector></app-image-selector>
+        </div>
+    </div>
+
+    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
+        <button class="btn btn-outline-light" id="dropdownBasic1" ngbDropdownToggle>Layers</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" style="overflow:auto; max-height: 600px; width:600px;"
+            class="bg-dark">
+            <app-layers></app-layers>
+        </div>
+    </div>
+    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
+        <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle>Advanced</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic3"
+            style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px"
+            class="bg-dark">
+            <app-git-manage></app-git-manage>
+            <app-revert-from-history></app-revert-from-history>
+        </div>
+    </div>
+    <div ngbDropdown display="dynamic" placement="bottom-right" class="d-inline-block">
+        <button class="btn btn-outline-light" id="dropdownBasic4" ngbDropdownToggle>Help</button>
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic4"
+            style="overflow:auto; max-height: 600px; color:#eee; width:300px; padding: 10px 10px 10px 10px"
+            class="bg-dark">
+            <h5>Controls</h5>
+            Scroll: Zoom<br>
+            Left Click: Place Point<br>
+            Right Click: Pan<br>
+            Ctrl+Z Undo<br>
+            Change Color: R, L, U, M, C<br>
+            Arrange layers with the To Top button in the Layers Panel.<br>
+            <br><br>
+            <h5>How to use</h5>
+            This is how I personally use this tool the quickest. First, I label all the movables and lane markings.
+            Next, I label the road, and move it to the bottom with the layer palette. Then I add a box of undrivable
+            over the entire image and move it to the bottom. Finally, I add the car section over the hood
+
+
+        </div>
+    </div>
+    <button type="button" class="btn btn-outline-light" (click)="save()">Save</button>
+    <button type="button" class="btn btn-outline-danger">Reset</button>
+
+
+
+</nav>
