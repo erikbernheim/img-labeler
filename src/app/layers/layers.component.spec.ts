@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CanvasMapComponent } from './canvas-map.component';
+import { LayersComponent } from './layers.component';
 
-describe('CanvasMapComponent', () => {
-  let component: CanvasMapComponent;
-  let fixture: ComponentFixture<CanvasMapComponent>;
+describe('LayersComponent', () => {
+  let component: LayersComponent;
+  let fixture: ComponentFixture<LayersComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CanvasMapComponent ]
+      declarations: [ LayersComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(CanvasMapComponent);
+    fixture = TestBed.createComponent(LayersComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
