@@ -102,8 +102,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
         this.maskSvc.getMaskUrl().subscribe(url => {
             this.loadedMask = true;
+            this.svg.selectAll('.existingMask').remove();
             const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
-                .attr('opacity', this.opacity * .01)
+                .attr('opacity', this.opacity)
                 .attr('visibility', 'visible');
             g.append('svg:image')
                 .attr('href', url)
@@ -133,6 +134,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             }
             if (obj.type === 'revert') {
                 this.revertFromLocalStorage(obj.collection);
+            }
+            if (obj.type === 'toggleAll') {
+                this.toggleAll();
             }
             this.setLayers();
         })
@@ -378,12 +382,12 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public toggleAll(): void {
         if (this.getVisibility(0)) {
-            for (const layer of this.layers) {
+            for (const layer of this.artboard.nativeElement.children[0].children) {
                 layer.setAttribute('visibility', 'hidden');
                 layer.setAttribute('layerHidden', 'true');
             }
         } else {
-            for (const layer of this.layers) {
+            for (const layer of this.artboard.nativeElement.children[0].children) {
                 layer.setAttribute('visibility', 'visible');
                 layer.setAttribute('layerHidden', 'false');
             }
@@ -422,10 +426,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     @HostListener('document:keyup', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
-        if (event.code === 'ArrowUp') { this.incrementOpacity(true); event.preventDefault(); }
-        if (event.code === 'ArrowDown') { this.incrementOpacity(false); event.preventDefault(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
-        if (event.code === 'Comma') { this.toggleAll(); }
 
     }
 
