@@ -10,22 +10,20 @@ import { ActivatedRoute } from '@angular/router';
   styleUrls: ['./image-selector.component.css']
 })
 export class ImageSelectorComponent implements OnInit, AfterViewInit {
-  public startUrl = environment.defaultImage;
-  public startNum;
   @ViewChild('url') url;
   @ViewChild('imageNumber') num;
 
   constructor(private maskSvc: MaskingService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
-    this.maskSvc.setImageUrl(environment.defaultImage)
-    	   
   }
 
   ngAfterViewInit(): void {
     this.activatedRoute.queryParams.subscribe(params => {
       if (params.imageNumber){
-          this.updateImageByNum(params.imageNumber);
+        this.updateImageByNum(params.imageNumber);
+      } else {
+        this.updateImageByNum(environment.defaultImageNumber);
       }
     });
 }
