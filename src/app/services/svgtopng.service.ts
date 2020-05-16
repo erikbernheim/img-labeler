@@ -9,7 +9,7 @@ import * as Jimp from 'jimp';
   providedIn: 'root'
 })
 export class SvgtopngService {
-
+  public base64Mask: string;
   constructor(private maskSvc: MaskingService) { }
 
 
@@ -83,6 +83,7 @@ export class SvgtopngService {
             this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', this.maskSvc.currentOpacity);
             this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 1);
             this.maskSvc.mask.d3.selectAll('.background').remove();
+            this.base64Mask = image;
             return image;
           }
         );
@@ -97,7 +98,7 @@ export class SvgtopngService {
             Jimp.read(uri, (err, image) => {
               originalMask.composite(image, 0, 0);
               return originalMask.getBase64('image/png',(err, res) => {
-                console.log('boooooop')
+                this.base64Mask = res;
                 return res;
               });
             });

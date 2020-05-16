@@ -68,7 +68,6 @@ export class GitManageComponent implements OnInit {
     let imgUrl = this.maskSvc.currentUrl.match(/[\w-]+\.png/)[0];
     this.svgToPng.base64ToGit()
     .then(base64 => {
-      console.log(base64)
     this.ngxService.start();
     const commitMessage =  prompt('Enter Commit Message', `${imgUrl.substr(0, 4)} ${this.userData.login}`).valueOf();
     this.git.getTree(this.userData.login, sha).pipe(
@@ -78,7 +77,7 @@ export class GitManageComponent implements OnInit {
     )
     .pipe(
       switchMap(ret => {
-      return this.git.commitFile(this.userData.login, commitMessage, base64.replace('data:image/png;base64,', ''),
+      return this.git.commitFile(this.userData.login, commitMessage, this.svgToPng.base64Mask.replace('data:image/png;base64,', ''),
           ret.tree.filter(mask => mask.path === imgUrl)[0].sha, branch, imgUrl);
       })
     ).subscribe(ret => {
