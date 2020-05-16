@@ -38,3 +38,11 @@ Step 5: Create a Pull Request (this will ask comma guys to check your images etc
 Report any issues in GitHub issues for this repo or in Discord.
 
 Any git questions can usually be answered on StackOverflow.
+
+
+### for development of images.json
+```
+a = glob.glob("r*.png")
+a.sort()
+for i in a[9:]: print('  {\n    "id": "'+i[:4]+'",\n    "val": "'+i+'"\n  },')
+```
