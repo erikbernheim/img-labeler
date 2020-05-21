@@ -28,6 +28,9 @@ export class LayersComponent implements OnInit {
   }
 
   public delete(i: number): void {
+    if(this.layers.length === 1){
+      this.layers = undefined;
+    }
     this.maskSvc.modifyLayer(new LayerChange({index: i, type: 'delete'}));
   }
 

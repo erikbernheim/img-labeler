@@ -296,7 +296,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         // this.updateOpacity();
     }
 
-    
+
 
     public updateImage(url?): void {
         if (url) { this.svg.style('background-image', `url('${url}')`); } else {
@@ -381,15 +381,17 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public toggleAll(): void {
-        if (this.getVisibility(0)) {
-            for (const layer of this.artboard.nativeElement.children[0].children) {
-                layer.setAttribute('visibility', 'hidden');
-                layer.setAttribute('layerHidden', 'true');
-            }
-        } else {
-            for (const layer of this.artboard.nativeElement.children[0].children) {
-                layer.setAttribute('visibility', 'visible');
-                layer.setAttribute('layerHidden', 'false');
+        if (this.artboard.nativeElement.children[0].children.length > 0) {
+            if (this.getVisibility(0)) {
+                for (const layer of this.artboard.nativeElement.children[0].children) {
+                    layer.setAttribute('visibility', 'hidden');
+                    layer.setAttribute('layerHidden', 'true');
+                }
+            } else {
+                for (const layer of this.artboard.nativeElement.children[0].children) {
+                    layer.setAttribute('visibility', 'visible');
+                    layer.setAttribute('layerHidden', 'false');
+                }
             }
         }
     }
