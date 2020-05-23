@@ -3,7 +3,7 @@ svg{
     background-size: 1164px 874px;
     background-position: center;
     background-repeat: no-repeat;
-    
+    image-rendering: pixelated;
 }
 
 .underline{

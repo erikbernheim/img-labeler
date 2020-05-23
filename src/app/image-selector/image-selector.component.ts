@@ -55,7 +55,7 @@ export class ImageSelectorComponent implements OnInit, AfterViewInit {
       this.maskSvc.setImageUrl(url);
     }
     else {
-      alert(`Image: ${imgN} does not exist.`);
+      alert(`Image ${imgN} does not exist.`);
     }
   }
 
