@@ -10,11 +10,16 @@ import { MaskingService } from '../services/masking.service';
 export class ToolbarColorSelectorComponent implements OnInit {
 
   constructor(public maskSvc: MaskingService) { }
-  public colors = environment.colors;
+  public colors = environment.colors.slice(1, environment.colors.length);
+  public ntype = environment.colors[0];
   ngOnInit(): void {
   }
   public setColor(index: number){
     this.maskSvc.setColor(index);
+    this.ntype = this.colors[index];
+    this.colors = environment.colors.filter((elem) => {
+      return (elem.name != this.ntype.name);
+    });
   }
 
 

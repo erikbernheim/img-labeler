@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Color } from '../models/color';
-import { Observable, of, BehaviorSubject, Subject } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { Layer } from '../models/layer';
 import { LayerChange } from '../models/layer-change';
-import * as d3 from 'd3';
 
 @Injectable({
   providedIn: 'root'
@@ -71,7 +70,8 @@ export class MaskingService {
     if (mask.dom.children[0].children.length > 0) {
       mask.dom.children[0].children.forEach(element => {
         if (element.classList[1] === 'completePoly') {
-          layers.push(new Layer({ type: element.classList[0], index: i.toString(), visibility: element.attributes.visibility.value }))
+          const color = element.getAttribute('color');
+          layers.push(new Layer({ type: color, index: i.toString(), visibility: element.attributes.visibility.value }))
         }
         i++;
       });

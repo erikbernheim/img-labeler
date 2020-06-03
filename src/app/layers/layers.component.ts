@@ -50,9 +50,11 @@ export class LayersComponent implements OnInit {
     this.maskSvc.modifyLayer(new LayerChange({index: 0, type: 'clearAll'}));
   }  
 
-  public getLayerType(layerColor: string): string{
-    if( layerColor === 'existingMask') {return 'Existing Mask'}
-   return environment.colors.filter(color => color.color == layerColor)[0].name;
+  public getLayerType(layerColor: string): {name:string, color:string}{
+    if( layerColor === 'existingMask') {
+      return {name:'Existing Mask', color: 'black'};
+    }
+    return environment.colors.filter(color => color.color == layerColor)[0];
   }
 
   public incrementOpacity(up: boolean): void {
@@ -64,8 +66,12 @@ export class LayersComponent implements OnInit {
     }
     this.opacityForm.nativeElement.value = opacity;
     this.updateOpacity();
-}
+  }
 
+  public setColor(layer: Layer, index: number) {
+    this.layers.forEach(e => {if(e.index === layer.index)e.update(index)});
+    this.maskSvc.modifyLayer(new LayerChange(layer));
+  }
 
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {

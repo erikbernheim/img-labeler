@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 import { MaskingService } from '../services/masking.service';
 import { Layer } from '../models/layer';
 import { SvgtopngService } from '../services/svgtopng.service';
+import { environment } from 'src/environments/environment';
 @Component({
     selector: 'app-drawing-canvas',
     templateUrl: './drawing-canvas.component.html',
@@ -104,6 +105,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.loadedMask = true;
             this.svg.selectAll('.existingMask').remove();
             const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly').attr('layerHidden', 'false')
+                .attr('color', 'existingMask')
                 .attr('opacity', this.opacity)
                 .attr('visibility', 'visible');
             g.append('svg:image')
@@ -137,6 +139,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             }
             if (obj.type === 'toggleAll') {
                 this.toggleAll();
+            }
+            if (environment.colors.map(e => e.color).includes(obj.type)) {
+                this.updateColor(obj.index, obj.type);
             }
             this.setLayers();
         })
@@ -186,7 +191,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('cy', this.points[this.points.length - 1][1])
             .attr('r', 4 / (this.panzoomModel.zoomLevel / 1.5))
             .attr('stroke-width', 1 / (this.panzoomModel.zoomLevel / 2))
-            .attr('fill', 'yellow')
+            .attr('fill', this.maskSvc.currentColor.color)
             .attr('stroke', '#000')
             .attr('is-handle', 'true')
             .attr('class', 'inProgressCircle')
@@ -201,6 +206,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg.selectAll('circle').attr('cursor', 'move');
         this.svg.select('g.drawPoly').remove();
         const g = this.svg.append('g').attr('class', this.maskSvc.currentColor.color + ' completePoly' + child).attr('layerHidden', 'false')
+            .attr('color', this.maskSvc.currentColor.color)
             .attr('opacity', this.opacity)
             .attr('visibility', 'visible');
         g.append('polygon')
@@ -367,6 +373,12 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public toBottom(i: number) {
         this.artboard.nativeElement.children[0].prepend(this.artboard.nativeElement.children[0].children[i]);
+    }
+
+    public updateColor(i: number, color: string) {
+        this.artboard.nativeElement.children[0].children[i].children[0].setAttribute('style', 'fill: ' + color + ';');
+        this.artboard.nativeElement.children[0].children[i].setAttribute('color', color);
+        // TODO update local storage?
     }
 
     public toggleVisibility(i: number) {
