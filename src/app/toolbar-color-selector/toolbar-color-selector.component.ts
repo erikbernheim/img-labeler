@@ -10,16 +10,32 @@ import { MaskingService } from '../services/masking.service';
 export class ToolbarColorSelectorComponent implements OnInit {
 
   constructor(public maskSvc: MaskingService) { }
-  public colors = environment.colors.slice(1, environment.colors.length);
+  public colors;
   public ntype = environment.colors[0];
+  public compactDropDownMenu = false;
+
   ngOnInit(): void {
+    this.selectMenuLayout(window.innerWidth);
   }
+
+  public selectMenuLayout(windowWidth) {
+    if (windowWidth < 1200) {
+      this.compactDropDownMenu = true;
+        this.colors = environment.colors.filter(elem => elem.name != this.ntype.name);
+    } else {
+      this.compactDropDownMenu = false;
+      this.colors = environment.colors;
+    }
+  }
+
   public setColor(index: number){
     this.maskSvc.setColor(index);
     this.ntype = this.colors[index];
-    this.colors = environment.colors.filter((elem) => {
-      return (elem.name != this.ntype.name);
-    });
+    if (this.compactDropDownMenu) {
+      this.colors = environment.colors.filter(elem => elem.name != this.ntype.name);
+    } else {
+      this.colors = environment.colors;
+    }
   }
 
 
@@ -32,4 +48,8 @@ export class ToolbarColorSelectorComponent implements OnInit {
       if (event.code === 'KeyC') { this.setColor(4); }
   }
   
+  @HostListener('window:resize', ['$event'])
+  onResize(event) {
+    this.selectMenuLayout(window.innerWidth);
+  }
 }
