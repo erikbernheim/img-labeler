@@ -21,7 +21,7 @@ export class ToolbarColorSelectorComponent implements OnInit {
   public selectMenuLayout(windowWidth) {
     if (windowWidth < 1200) {
       this.compactDropDownMenu = true;
-        this.colors = environment.colors.filter(elem => elem.name != this.ntype.name);
+      this.colors = environment.colors.filter(elem => elem.name != this.ntype.name);
     } else {
       this.compactDropDownMenu = false;
       this.colors = environment.colors;
@@ -29,11 +29,12 @@ export class ToolbarColorSelectorComponent implements OnInit {
   }
 
   public setColor(index: number){
-    this.maskSvc.setColor(index);
     this.ntype = this.colors[index];
     if (this.compactDropDownMenu) {
+      this.maskSvc.setColor(environment.colors.findIndex(e => e.name === this.ntype.name));
       this.colors = environment.colors.filter(elem => elem.name != this.ntype.name);
     } else {
+      this.maskSvc.setColor(index);
       this.colors = environment.colors;
     }
   }
@@ -41,11 +42,18 @@ export class ToolbarColorSelectorComponent implements OnInit {
 
   @HostListener('document:keyup', ['$event'])
   handleKeyboardEvent(event: KeyboardEvent) {
-      if (event.code === 'KeyR') { this.setColor(0); }
-      if (event.code === 'KeyL') { this.setColor(1); }
-      if (event.code === 'KeyU') { this.setColor(2); }
-      if (event.code === 'KeyM') { this.setColor(3); }
-      if (event.code === 'KeyC') { this.setColor(4); }
+    const KeyMap = ['KeyR', 'KeyL', 'KeyU', 'KeyM', 'KeyC'];
+    if (KeyMap.includes(event.code)) {
+      const index = KeyMap.findIndex(e => e === event.code);
+      if (this.compactDropDownMenu) {
+        const name = environment.colors[index].name;
+        if (name !== this.ntype.name) {
+          this.setColor(this.colors.findIndex(e => e.name === name));
+        }
+      } else {
+        this.setColor(index);
+      }
+    }
   }
   
   @HostListener('window:resize', ['$event'])
