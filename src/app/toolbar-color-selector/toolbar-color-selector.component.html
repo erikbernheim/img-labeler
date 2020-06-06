@@ -1,1 +1,18 @@
-<button *ngFor="let color of colors index as i" class="btn btn-dark ml-2" type="button" [ngStyle]="{'border-color': color.color, 'background-color': color.color, 'text-decoration': this.maskSvc.currentColor.color === color.color ? 'underline' : 'none'}" (click)="setColor(i)">{{color.name}}</button>
+<div ngbDropdown #myDrop="ngbDropdown" *ngIf="compactDropDownMenu" [autoClose]="false" display="dynamic" placement="bottom-right" class="d-inline-block">
+    <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle
+      [ngStyle]="{'width': '150px', 'border-color': ntype.color, 'background-color': ntype.color}"
+    >{{ntype.name}}</button>
+    <div ngbDropdownMenu aria-labelledby="dropdownBasic3" style="overflow:auto; max-height: 600px;" class="bg-dark">
+        <button *ngFor="let color of colors index as i" class="btn btn-dark ml-2" type="button"
+         [ngStyle]="{'width': '140px', 'border-color': color.color, 'background-color': color.color, 'text-decoration': this.maskSvc.currentColor.color === color.color ? 'underline' : 'none'}"
+         (click)="setColor(i); myDrop.close()"
+        >{{color.name}}</button>
+    </div>
+</div>
+
+<div *ngIf="!compactDropDownMenu">
+<button  *ngFor="let color of colors index as i" class="btn btn-dark ml-2" type="button"
+ [ngStyle]="{'border-color': color.color, 'background-color': color.color, 'text-decoration': this.maskSvc.currentColor.color === color.color ? 'underline' : 'none'}"
+  (click)="setColor(i)">
+ {{color.name}}</button>
+</div>
