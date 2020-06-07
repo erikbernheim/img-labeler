@@ -29,7 +29,18 @@
         <tbody>
             <tr *ngFor="let layer of layers">
                 <th>{{layer.index}}</th>
-                <th>{{getLayerType(layer.type)}}</th>
+                <th><div ngbDropdown #myDrop="ngbDropdown" [autoClose]="false" display="dynamic" placement="top-left">
+                    <button class="btn btn-outline-light" id="dropdownBasic3" ngbDropdownToggle
+                      [ngStyle]="{'width': '150px', 'border-color': getLayerType(layer.type).color, 'background-color': getLayerType(layer.type).color}"
+                    >{{getLayerType(layer.type).name}}</button>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic3" style="width: 450px;" class="bg-dark">
+                        <button *ngFor="let color of layer.colors index as i" class="btn btn-dark ml-2" type="button"
+                         [ngStyle]="{'border-color': color.color, 'background-color': color.color}"
+                         (click)="setColor(layer, i); myDrop.close()"
+                        >{{color.name}}</button>
+                    </div>
+                </div>
+                </th>
                 <th><i class="fa fa-arrow-up" (click)="toTop(layer.index)" aria-hidden="true"></i></th>
                 <th><i class="fa fa-arrow-down" (click)="toBottom(layer.index)" aria-hidden="true"></i></th>
                 <th><i (click)="toggle(layer.index)" *ngIf="layer.visibility" class="fa fa-eye"
