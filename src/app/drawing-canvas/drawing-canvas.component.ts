@@ -441,7 +441,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
-
+        if (event.code === 'Numpad0' || event.code === 'Digit0') { this.panZoomAPI.resetView()}
     }
 
     public getLayerType(i: number): string {
