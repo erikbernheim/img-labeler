@@ -30,15 +30,30 @@ export class MaskingService {
     this.artboard = artboard;
   }
 
+  public togglePixelation(): void {
+    if (getComputedStyle(this.mask.dom.children[0]).imageRendering === 'pixelated') {
+      this.mask.dom.children[0].style.imageRendering = 'auto';
+    } else {
+      this.mask.dom.children[0].style.imageRendering = 'pixelated';
+    }
+  }
+
+  public getPixelation(): boolean {
+    if (getComputedStyle(this.mask.dom.children[0]).imageRendering === 'pixelated') {
+      return true;
+    }
+      return false;
+  }
+
   public getColor(): Color {
     return this.currentColor;
   }
 
   public setImageUrl(url: string): void {
     if (this.mask && this.mask.dom.children[0].children.length > 0) {
-        this.modifyLayer(new LayerChange({index: 0, type: 'clearAll'}));
-        this.currentUrl = url;
-        this.imageUrl.next(url);
+      this.modifyLayer(new LayerChange({ index: 0, type: 'clearAll' }));
+      this.currentUrl = url;
+      this.imageUrl.next(url);
     } else {
       this.currentUrl = url;
       this.imageUrl.next(url);

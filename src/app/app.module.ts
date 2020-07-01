@@ -14,6 +14,7 @@ import { ToolbarColorSelectorComponent } from './toolbar-color-selector/toolbar-
 import { ImageSelectorComponent } from './image-selector/image-selector.component';
 import { LayersComponent } from './layers/layers.component';
 import { RevertFromHistoryComponent } from './revert-from-history/revert-from-history.component';
+import { TogglePixelationComponent } from './toggle-pixelation/toggle-pixelation.component';
 
 
 
@@ -27,7 +28,8 @@ import { RevertFromHistoryComponent } from './revert-from-history/revert-from-hi
     ToolbarColorSelectorComponent,
     ImageSelectorComponent,
     LayersComponent,
-    RevertFromHistoryComponent
+    RevertFromHistoryComponent,
+    TogglePixelationComponent
   ],
   imports: [
     BrowserModule,

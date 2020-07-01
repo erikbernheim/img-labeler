@@ -437,6 +437,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.svg.select('g.drawPoly').remove();
     }
 
+
     @HostListener('document:keyup', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
