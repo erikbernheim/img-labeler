@@ -35,6 +35,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public history = [];
     public providedURL: string;
     public customMaskURL: string;
+    public svgElement;
     public panzoomConfig: PanZoomConfig = new PanZoomConfig({
         zoomLevels: 10,
         scalePerZoomLevel: 1.5,
@@ -62,9 +63,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     ngAfterViewInit(): void {
         this.maskSvc.setArtboard(this.artboard.nativeElement.innerHTML);
         this.setLayers();
-
+        this.svgElement = this.artboard.nativeElement.children[0];
     }
-
 
     constructor(private renderer: Renderer2, private pngToSvg: PngToSvgService,
         private ngxService: NgxUiLoaderService, private lut: LutServiceService,
@@ -85,13 +85,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.panzoomModel = model;
         });
 
-
         this.svg = d3.select('.artboard').append('svg')
             .attr('height', 950)
             .attr('width', 1250);
-
-
-
 
         this.activatedRoute.queryParams.subscribe(params => {
             const userId = params.userId;
@@ -326,7 +322,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public addToHistory(drawing, startPoint, g, points): void {
-        const collection = this.artboard.nativeElement.children[0].innerHTML;
+        const collection = this.svgElement.innerHTML;
         this.history.unshift([JSON.stringify(collection), JSON.stringify(drawing),
         JSON.stringify(startPoint), cloneDeep(g), JSON.stringify(points)]);
         if (this.history.length > 15) {
@@ -357,7 +353,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     public undo(): void {
         if (this.history.length > 0) {
-            this.artboard.nativeElement.children[0].innerHTML = JSON.parse(this.history[0][0]);
+            this.svgElement.innerHTML = JSON.parse(this.history[0][0]);
             this.drawing = JSON.parse(this.history[0][1]);
             this.startPoint = JSON.parse(this.history[0][2]);
             this.g = this.history[0][3];
@@ -368,41 +364,41 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
     public toFront(i: number) {
-        this.artboard.nativeElement.children[0].append(this.artboard.nativeElement.children[0].children[i]);
+        this.svgElement.append(this.svgElement.children[i]);
     }
 
     public toBottom(i: number) {
-        this.artboard.nativeElement.children[0].prepend(this.artboard.nativeElement.children[0].children[i]);
+        this.svgElement.prepend(this.svgElement.children[i]);
     }
 
     public updateColor(i: number, color: string) {
-        this.artboard.nativeElement.children[0].children[i].children[0].setAttribute('style', 'fill: ' + color + ';');
-        this.artboard.nativeElement.children[0].children[i].setAttribute('color', color);
+        this.svgElement.children[i].children[0].setAttribute('style', 'fill: ' + color + ';');
+        this.svgElement.children[i].setAttribute('color', color);
         // TODO update local storage?
     }
 
     public toggleVisibility(i: number) {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('visibility') !== 'hidden') {
-            this.artboard.nativeElement.children[0].children[i].setAttribute('visibility', 'hidden');
-            this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'true');
+        if (this.svgElement.children[i].getAttribute('visibility') !== 'hidden') {
+            this.svgElement.children[i].setAttribute('visibility', 'hidden');
+            this.svgElement.children[i].setAttribute('layerHidden', 'true');
             return;
         }
-        this.artboard.nativeElement.children[0].children[i].setAttribute('visibility', 'visible');
-        this.artboard.nativeElement.children[0].children[i].setAttribute('layerHidden', 'false');
+        this.svgElement.children[i].setAttribute('visibility', 'visible');
+        this.svgElement.children[i].setAttribute('layerHidden', 'false');
         this.setLayers();
     }
 
     public toggleAll(): void {
-        if (this.artboard.nativeElement.children[0].children.length > 0) {
+        if (this.svgElement.children.length > 0) {
             if (this.getVisibility(0)) {
-                for (const layer of this.artboard.nativeElement.children[0].children) {
+                for (const layer of this.svgElement.children) {
                     if (layer.classList.contains('completePoly')) {
                         layer.setAttribute('visibility', 'hidden');
                         layer.setAttribute('layerHidden', 'true');
                     }
                 }
             } else {
-                for (const layer of this.artboard.nativeElement.children[0].children) {
+                for (const layer of this.svgElement.children) {
                     layer.setAttribute('visibility', 'visible');
                     layer.setAttribute('layerHidden', 'false');
                 }
@@ -410,8 +406,16 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         }
     }
 
+    public toggleControlPoints(): void {
+        if (this.svgElement.classList.contains('hideCircles')) {
+            this.svgElement.classList.remove('hideCircles');
+        } else {
+            this.svgElement.classList.add('hideCircles');
+        }
+    }
+
     public getVisibility(i: number): boolean {
-        if (this.artboard.nativeElement.children[0].children[i].getAttribute('visibility') === 'visible') {
+        if (this.svgElement.children[i].getAttribute('visibility') === 'visible') {
             return true;
         }
         return false;
@@ -421,7 +425,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (this.getLayerType(i) === 'Existing Mask') {
             this.loadedMask = false;
         }
-        this.artboard.nativeElement.children[0].children[i].remove();
+        this.svgElement.children[i].remove();
     }
 
     public deleteAllLayers() {
@@ -443,6 +447,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     @HostListener('document:keyup', ['$event'])
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
+        if (event.code === 'BracketLeft') { this.toggleControlPoints(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
         if (event.code === 'Numpad0' || event.code === 'Digit0') { this.panZoomAPI.resetView() }
     }
@@ -452,7 +457,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         const colors = [['#402020 completePoly', 'Road'], ['#ff0000 completePoly', 'Lane Markings'], ['#808060 completePoly', 'Undrivable'],
         ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car'], ['existingMask completePoly', 'Existing Mask']];
         for (const color of colors) {
-            if (color[0] === this.artboard.nativeElement.children[0].children[i].getAttribute('class')) {
+            if (color[0] === this.svgElement.children[i].getAttribute('class')) {
                 return color[1];
             }
         }
