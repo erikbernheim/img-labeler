@@ -396,8 +396,10 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         if (this.artboard.nativeElement.children[0].children.length > 0) {
             if (this.getVisibility(0)) {
                 for (const layer of this.artboard.nativeElement.children[0].children) {
-                    layer.setAttribute('visibility', 'hidden');
-                    layer.setAttribute('layerHidden', 'true');
+                    if (layer.classList.contains('completePoly')) {
+                        layer.setAttribute('visibility', 'hidden');
+                        layer.setAttribute('layerHidden', 'true');
+                    }
                 }
             } else {
                 for (const layer of this.artboard.nativeElement.children[0].children) {
@@ -442,7 +444,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
-        if (event.code === 'Numpad0' || event.code === 'Digit0') { this.panZoomAPI.resetView()}
+        if (event.code === 'Numpad0' || event.code === 'Digit0') { this.panZoomAPI.resetView() }
     }
 
     public getLayerType(i: number): string {
