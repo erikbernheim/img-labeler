@@ -41,7 +41,6 @@ export class RevertFromHistoryComponent implements OnInit {
   }
 
   public delete(key: string): void {
-    console.log(key)
     localStorage.removeItem(key);
     this.loadMasksFromStorage();
   }

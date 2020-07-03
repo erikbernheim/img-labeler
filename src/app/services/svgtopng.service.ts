@@ -62,7 +62,6 @@ export class SvgtopngService {
 
   public base64ToGit(): Promise<string> {
     const holder = this;
-    console.log('wack')
     let gitImage;
     if (!this.maskSvc.loadedMask()) {
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
@@ -82,7 +81,6 @@ export class SvgtopngService {
           }
         );
     } else {
-      console.log('90000')
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
@@ -106,7 +104,6 @@ export class SvgtopngService {
   }
 
   public setBase64(image): string {
-    console.log('ongo bongo')
     return image.getBase64(Jimp.AUTO, (err, res) => {
       return res;
     });
