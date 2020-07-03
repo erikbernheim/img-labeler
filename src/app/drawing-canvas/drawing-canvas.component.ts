@@ -54,6 +54,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public loadedMask = false;
     public layerPoints = [];
     public localStorage = [];
+    public previewShown = false;
     @ViewChild('artboard') artboard;
     public opacity: number = 100;
     @ViewChild('imageNumber') imageNumber;
@@ -111,6 +112,13 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         })
 
         this.maskSvc.getLayerChange().subscribe(obj => {
+            if (obj.type === 'opacity') {
+                this.svg.selectAll('.completePoly').attr('opacity', obj.index * .01);
+                this.opacity = obj.index * .01;
+            }
+            if (this.previewShown) {
+                return;
+            }
             if (obj.type === 'delete') {
                 this.deleteLayer(obj.index);
             }
@@ -122,10 +130,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             }
             if (obj.type === 'toggle') {
                 this.toggleVisibility(obj.index);
-            }
-            if (obj.type === 'opacity') {
-                this.svg.selectAll('.completePoly').attr('opacity', obj.index * .01);
-                this.opacity = obj.index * .01;
             }
             if (obj.type === 'clearAll') {
                 this.deleteAllLayers();
@@ -148,14 +152,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     }
 
 
-
-    // NEW METHODS!!!!
-
     private setLayers(): void {
         this.maskSvc.updateMask({ d3: this.svg, dom: this.artboard.nativeElement, loadedMask: this.loadedMask });
     }
-
-    //OLD METHODS
 
     public mouseUp(e) {
         if (this.g) {
@@ -164,6 +163,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.g = this.svg.select('g.drawPoly');
         if (e.button !== 0) { return; }
         if (this.dragging) { return; }
+        if (this.previewShown) { return; }
         this.drawing = true;
         this.startPoint = [(e.layerX - this.panzoomModel.pan.x) *
             (1 / (this.artboard.nativeElement.getBoundingClientRect().width / this.artboard.nativeElement.offsetWidth)),
@@ -418,6 +418,41 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         }
     }
 
+    public previewExport(): void {
+        if (!this.previewShown) {
+            if (this.drawing) {
+                return;
+            }
+            this.previewShown = true;
+            this.svgToPng.base64ToGit()
+                .then(base64 => {
+                    const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly' + ' preview').attr('layerHidden', 'false')
+                        .attr('color', 'existingMask')
+                        .attr('opacity', this.opacity)
+                        .attr('visibility', 'visible');
+                    g.append('svg:image')
+                        .attr('href', base64)
+                        .attr('x', 43)
+                        .attr('y', 38)
+                    for (const layer of this.svgElement.children) {
+                        if (!layer.classList.contains('preview')) {
+                            layer.setAttribute('visibility', 'hidden');
+                            layer.setAttribute('layerHidden', 'true');
+                        }
+                    }
+                    this.setLayers();
+                });
+        } else {
+            this.svg.selectAll('.preview').remove();
+            this.previewShown = false;
+            for (const layer of this.svgElement.children) {
+                layer.setAttribute('visibility', 'visible');
+                layer.setAttribute('layerHidden', 'false');
+            }
+            this.setLayers();
+        }
+    }
+
     public getVisibility(i: number): boolean {
         if (this.svgElement.children[i].getAttribute('visibility') === 'visible') {
             return true;
@@ -452,6 +487,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     handleKeyboardEvent(event: KeyboardEvent) {
         if (event.code === 'Escape') { this.deleteCurrentLayer(); }
         if (event.code === 'BracketLeft') { this.toggleControlPoints(); }
+        if (event.code === 'KeyO') { this.previewExport(); }
         if (event.code === 'KeyZ' && event.ctrlKey === true) { this.undo(); }
         if (event.code === 'Numpad0' || event.code === 'Digit0') { this.panZoomAPI.resetView() }
     }
