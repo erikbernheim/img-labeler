@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MaskingService } from '../services/masking.service';
+import { LayerChange } from '../models/layer-change';
 
 @Component({
   selector: 'app-revert-from-history',
@@ -15,6 +16,11 @@ export class RevertFromHistoryComponent implements OnInit {
     if (i >= 31) {
       alert(`You currently have ${i - 1} masks in in local storage. img-labeler recommends you don't exceed 30, consider deleting some under the Advanced dropdown`)
     }
+  }
+
+  public save(){
+    this.maskSvc.modifyLayer(new LayerChange({index: 0, type: 'addToLocalStorage'}));
+    this.loadMasksFromStorage();
   }
 
   public loadMasksFromStorage(): number{
@@ -37,7 +43,7 @@ export class RevertFromHistoryComponent implements OnInit {
   public delete(key: string): void {
     console.log(key)
     localStorage.removeItem(key);
-  this.loadMasksFromStorage();
+    this.loadMasksFromStorage();
   }
 
 }

@@ -1,12 +1,15 @@
 <h5>Revert From History</h5>
-    <table class="table table-striped table-dark" *ngIf="previousMasks">
+<table class="table table-striped table-dark table-sm" *ngIf="previousMasks">
+    <tbody>
         <tr *ngFor="let mask of previousMasks">
-            <th>
+            <td>
                 {{mask.id}}
-            </th>
-            <th>
+            </td>
+            <td>
                 <button class="btn btn-outline-primary btn-sm ml-1" (click)="revert(mask.data)">Revert</button>
                 <button class="btn btn-outline-danger btn-sm ml-1" (click)="delete(mask.key)">Delete</button>
-            </th>
+            </td>
         </tr>
-        </table>
+    </tbody>
+</table>
+<h6>Save To History <button class="btn btn-outline-primary btn-sm ml-1" (click)="save()">Save</button></h6>

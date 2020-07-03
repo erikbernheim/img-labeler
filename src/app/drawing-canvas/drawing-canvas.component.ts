@@ -136,6 +136,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             if (obj.type === 'toggleAll') {
                 this.toggleAll();
             }
+            if (obj.type === 'addToLocalStorage') {
+                this.addToLocalStorage();
+            }
             if (environment.colors.map(e => e.color).includes(obj.type)) {
                 this.updateColor(obj.index, obj.type);
             }
@@ -349,6 +352,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.enableDragging();
         this.setLayers();
         this.loadedMask = this.maskSvc.loadedMask();
+        this.svgElement = this.artboard.nativeElement.children[0];
     }
 
     public undo(): void {
