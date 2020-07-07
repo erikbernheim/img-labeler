@@ -34,6 +34,7 @@ export class RevertFromHistoryComponent implements OnInit {
       }
       i++;
     }
+    this.previousMasks.sort((a, b) => (a.id > b.id) ? 1 : -1);
     return i;
   }
   public revert(collection: string): void {
