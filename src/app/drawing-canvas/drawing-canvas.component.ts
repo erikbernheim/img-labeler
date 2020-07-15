@@ -156,7 +156,19 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.maskSvc.updateMask({ d3: this.svg, dom: this.artboard.nativeElement, loadedMask: this.loadedMask });
     }
 
+    private deleteLayerClick(e): void {
+        if (e.target.tagName === 'polygon') {
+            e.target.parentNode.remove();
+        }
+        this.setLayers();
+        this.addToLocalStorage();
+    }
+
     public mouseUp(e) {
+        if(!this.drawing && e.altKey) {
+            this.deleteLayerClick(e);
+            return;
+        }
         if (this.g) {
             this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         }
@@ -197,7 +209,6 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             .attr('style', 'cursor:pointer');
     }
     public closePolygon(childPoly?: boolean) {
-        this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
         let child = '';
         if (childPoly) {
             child = ' child';
@@ -242,6 +253,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         this.drawing = false;
         this.setLayers();
         this.addToLocalStorage();
+        this.addToHistory(this.drawing, this.startPoint, this.g, this.points);
     }
 
     public enableDragging() {
