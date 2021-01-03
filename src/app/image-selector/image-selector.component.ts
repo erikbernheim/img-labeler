@@ -25,6 +25,16 @@ export class ImageSelectorComponent implements OnInit, AfterViewInit {
       } else {
         this.updateImageByNum(environment.defaultImageNumber);
       }
+      setTimeout(() => {
+        if (params.showMask) {
+          if(params.showMask === 'true') {
+            this.showMask();
+          } else {
+            this.showMask(params.showMask)
+          }
+        }
+      });
+      
     });
   }
   public showMask(url?: string): void {
