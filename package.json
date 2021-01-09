@@ -1,6 +1,6 @@
 {
   "name": "img-labeler",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "scripts": {
     "ng-high-memory": "node --max_old_space_size=8000 ./node_modules/@angular/cli/bin/ng",
     "ng": "ng",
