@@ -440,7 +440,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
                 .then(base64 => {
                     const g = this.svg.append('g').attr('class', 'existingMask' + ' completePoly' + ' preview').attr('layerHidden', 'false')
                         .attr('color', 'existingMask')
-                        .attr('opacity', this.opacity)
+                        .attr('opacity', (this.opacity > 0.2 ? this.opacity : 0.2))
                         .attr('visibility', 'visible');
                     g.append('svg:image')
                         .attr('href', base64)
