@@ -17,7 +17,6 @@ export class SvgtopngService {
     const holder = this;
     if (!this.maskSvc.loadedMask()) {
       this.dimensions = this.maskSvc.getDimensions();
-console.log(this.dimensions);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
