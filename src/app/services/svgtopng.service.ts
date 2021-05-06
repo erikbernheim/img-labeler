@@ -11,19 +11,20 @@ import * as Jimp from 'jimp';
 export class SvgtopngService {
   public base64Mask: string;
   constructor(private maskSvc: MaskingService) { }
-
+  public dimensions;
 
   public save(): void {
     const holder = this;
     if (!this.maskSvc.loadedMask()) {
+      this.dimensions = this.maskSvc.getDimensions();
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
       this.maskSvc.mask.d3.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
-        .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
+        .attr('points', '0,0,0,'+this.dimensions.canvasHeight+','+this.dimensions.canvasWidth+','+this.dimensions.canvasHeight+','+this.dimensions.canvasWidth+',0').attr('shape-rendering', 'crispEdges');
 
       svgSave.saveSvgAsPng(this.maskSvc.mask.dom.children[0], this.maskSvc.getCurrentImageUrl().match(/[\w-]+\.(png|jpg)/)[0]
-        .replace(/.(png|jpg)/, ''), { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0, scale: (1 / window.devicePixelRatio) }).then(
+        .replace(/.(png|jpg)/, ''), { width: this.dimensions.width, height: this.dimensions.height, top: 38, left: 43, encoderOptions: 0.0, scale: (1 / window.devicePixelRatio) }).then(
           () => {
             this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', this.maskSvc.currentOpacity);
             this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 1);
@@ -35,7 +36,7 @@ export class SvgtopngService {
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
-      svgSave.svgAsPngUri(this.maskSvc.mask.dom.children[0], { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0, scale: (1 / window.devicePixelRatio) })
+      svgSave.svgAsPngUri(this.maskSvc.mask.dom.children[0], { width: this.dimensions.width, height: this.dimensions.height, top: 38, left: 43, encoderOptions: 0.0, scale: (1 / window.devicePixelRatio) })
         .then(uri => {
           Jimp.read(this.maskSvc.loadedMaskUrl(), (err, originalMask) => {
             Jimp.read(uri, (err, image) => {
@@ -64,13 +65,14 @@ export class SvgtopngService {
     const holder = this;
     let gitImage;
     if (!this.maskSvc.loadedMask()) {
+      this.dimensions = this.maskSvc.getDimensions();
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
       this.maskSvc.mask.d3.insert('polygon', ':first-child').attr('class', 'background').style('fill', '#808060')
-        .attr('points', '0,0,0,950,1250,950,1250,0').attr('shape-rendering', 'crispEdges');
+        .attr('points', '0,0,0,'+this.dimensions.canvasHeight+','+this.dimensions.canvasWidth+','+this.dimensions.canvasHeight+','+this.dimensions.canvasWidth+',0').attr('shape-rendering', 'crispEdges');
       return svgSave.svgAsPngUri(this.maskSvc.mask.dom.children[0],
-        { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 }).then(
+        { width: this.dimensions.width, height: this.dimensions.height, top: 38, left: 43, encoderOptions: 0.0 }).then(
           (image) => {
             gitImage = image;
             this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', this.maskSvc.currentOpacity);
@@ -84,7 +86,7 @@ export class SvgtopngService {
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('opacity', 1);
       this.maskSvc.mask.d3.selectAll('.completePoly').attr('visibility', 'visible');
       this.maskSvc.mask.d3.selectAll('circle').attr('opacity', 0);
-      return svgSave.svgAsPngUri(this.maskSvc.mask.dom.children[0], { width: 1164, height: 874, top: 38, left: 43, encoderOptions: 0.0 })
+      return svgSave.svgAsPngUri(this.maskSvc.mask.dom.children[0], { width: this.dimensions.width, height: this.dimensions.height, top: 38, left: 43, encoderOptions: 0.0 })
         .then(uri => {
           Jimp.read(this.maskSvc.loadedMaskUrl(), (err, originalMask) => {
             Jimp.read(uri, (err, image) => {

@@ -61,6 +61,8 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     @ViewChild('url') url;
     @Output() Layers;
 
+    private dimensions;
+
     ngAfterViewInit(): void {
         this.maskSvc.setArtboard(this.artboard.nativeElement.innerHTML);
         this.setLayers();
@@ -86,15 +88,18 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
             this.panzoomModel = model;
         });
 
+        this.dimensions = this.maskSvc.getDimensions();
         this.svg = d3.select('.artboard').append('svg')
-            .attr('height', 950)
-            .attr('width', 1250);
+            .attr('background-size', this.dimensions.width+'px '+this.dimensions.height+'px')
+            .attr('height', this.dimensions.canvasHeight)
+            .attr('width', this.dimensions.canvasWidth);
 
         this.activatedRoute.queryParams.subscribe(params => {
             const userId = params.userId;
         });
 
         this.maskSvc.getImageUrl().subscribe(url => {
+            this.updateCanvas();
             this.svg.style('background-image', `url('${url}')`);
         })
 
@@ -151,6 +156,16 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
 
     }
 
+    private updateCanvas(): void {
+      // Set canvas dimensions in case it changed
+      this.dimensions = this.maskSvc.getDimensions();
+      if (this.dimensions) {
+        this.svg = d3.select('.artboard').select('svg')
+          .attr('height', this.dimensions.canvasHeight)
+          .attr('width', this.dimensions.canvasWidth);
+        this.svg.style('background-size', this.dimensions.width+'px '+this.dimensions.height+'px');
+      }
+    }
 
     private setLayers(): void {
         this.maskSvc.updateMask({ d3: this.svg, dom: this.artboard.nativeElement, loadedMask: this.loadedMask });

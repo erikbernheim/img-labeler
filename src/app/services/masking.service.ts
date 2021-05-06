@@ -20,6 +20,24 @@ export class MaskingService {
   public currentMaskUrl: string;
   public artboard: any;
 
+  // TODO: This is a hack, do this right (using a model?)!
+  public imgDimensionConfig = {
+    "imgs": {
+      width: 1164,
+      height: 874,
+      canvasWidth: 1250,
+      canvasHeight: 950
+    },
+    "imgs2": {
+      width: 1928,
+      height: 1208,
+      canvasWidth: 2014,
+      canvasHeight: 1284
+    }
+  };
+
+  public series = "imgs";
+
   constructor() {
   }
   public setColor(index: number): void {
@@ -50,6 +68,8 @@ export class MaskingService {
   }
 
   public setImageUrl(url: string): void {
+    var series = url.match(/[\w-]+\/[\w-]+\.(png|jpg)$/)[0].split("/")[0];
+    this.setDimensions(series);
     if (this.mask && this.mask.dom.children[0].children.length > 0) {
       this.modifyLayer(new LayerChange({ index: 0, type: 'clearAll' }));
       this.currentUrl = url;
@@ -58,6 +78,14 @@ export class MaskingService {
       this.currentUrl = url;
       this.imageUrl.next(url);
     }
+  }
+
+  public setDimensions(series: string): void {
+    this.series = series;
+  }
+
+  public getDimensions(): void {
+    return this.imgDimensionConfig[this.series];
   }
 
   public getImageUrl(): Observable<string> {
