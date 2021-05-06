@@ -20,6 +20,7 @@ export class MaskingService {
   public currentMaskUrl: string;
   public artboard: any;
 
+  // TODO: This is a hack, do this right (using a model?)!
   public imgDimensionConfig = {
     "imgs": {
       width: 1164,
