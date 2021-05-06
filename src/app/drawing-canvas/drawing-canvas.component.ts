@@ -99,9 +99,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
         });
 
         this.maskSvc.getImageUrl().subscribe(url => {
-            // Update canvas in case we need to change dimensions
             this.updateCanvas();
-	    this.svg.style('background-size', this.dimensions.width+'px '+this.dimensions.height+'px');
             this.svg.style('background-image', `url('${url}')`);
         })
 
@@ -163,9 +161,9 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
       this.dimensions = this.maskSvc.getDimensions();
       if (this.dimensions) {
         this.svg = d3.select('.artboard').select('svg')
-          .attr('background-size', this.dimensions.width+'px '+this.dimensions.height+'px')
           .attr('height', this.dimensions.canvasHeight)
           .attr('width', this.dimensions.canvasWidth);
+        this.svg.style('background-size', this.dimensions.width+'px '+this.dimensions.height+'px');
       }
     }
 
