@@ -38,8 +38,6 @@ export class MaskingService {
 
   public series = "imgs";
 
-  constructor() { }
-
   public setColor(index: number): void {
     this.currentColor = environment.colors[index];
   }
