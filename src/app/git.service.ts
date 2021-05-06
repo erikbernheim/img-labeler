@@ -72,7 +72,10 @@ export class GitService {
       'Content-Type':  'application/json',
       'Authorization': localStorage.getItem('gitToken')
     });
-    const url = `https://api.github.com/repos/${user}/comma10k/contents/masks/${imageName}`;
+    let url = `https://api.github.com/repos/${user}/comma10k/contents/masks/${imageName}`;
+    if(imageName.indexOf('_') === 5){
+      url = `https://api.github.com/repos/${user}/comma10k/contents/masks2/${imageName}`;
+    }
     return this.http.put(url, body, {headers: header});
   }
 }

@@ -27,14 +27,14 @@ export class ImageSelectorComponent implements OnInit, AfterViewInit {
       }
       setTimeout(() => {
         if (params.showMask) {
-          if(params.showMask === 'true') {
+          if (params.showMask === 'true') {
             this.showMask();
           } else {
             this.showMask(params.showMask)
           }
         }
       });
-      
+
     });
   }
   public showMask(url?: string): void {
@@ -54,18 +54,34 @@ export class ImageSelectorComponent implements OnInit, AfterViewInit {
   }
 
   public updateImageByNum(number?: string): void {
-    let imgN = this.num.nativeElement.value.padStart(4, '0');
-    if (number) {
-      imgN = number.padStart(4, '0');
-      this.num.nativeElement.value = imgN;
-    }
-    if (lut.filter(element => element.id === imgN).length > 0) {
-      let url = `${environment.imageDirectory}${lut.find(obj => obj.id === imgN).val}`;
-      this.url.nativeElement.value = url;
-      this.maskSvc.setImageUrl(url);
-    }
-    else {
-      alert(`Image ${imgN} does not exist.`);
+    if (!['e', 'f'].includes(this.num.nativeElement.value.slice(-1))) {
+      let imgN = this.num.nativeElement.value.padStart(4, '0');
+      if (number) {
+        imgN = number.padStart(4, '0');
+        this.num.nativeElement.value = imgN;
+      }
+      if (lut.filter(element => element.id === imgN).length > 0) {
+        let url = `${environment.imageDirectory}${lut.find(obj => obj.id === imgN).val}`;
+        this.url.nativeElement.value = url;
+        this.maskSvc.setImageUrl(url);
+      }
+      else {
+        alert(`Image ${imgN} does not exist.`);
+      }
+    } else {
+      let imgN = this.num.nativeElement.value.padStart(6, '0');
+      if (number) {
+        imgN = number.padStart(6, '0');
+        this.num.nativeElement.value = imgN;
+      }
+      if (lut.filter(element => element.id === imgN).length > 0) {
+        let url = `${environment.image2Directory}${lut.find(obj => obj.id === imgN).val}`;
+        this.url.nativeElement.value = url;
+        this.maskSvc.setImageUrl(url);
+      }
+      else {
+        alert(`Image ${imgN} does not exist.`);
+      }
     }
   }
 
