@@ -36,7 +36,6 @@ export class MaskingService {
     }
   };
 
-  public imgDimension = "imgs";
   public series = "imgs";
 
   constructor() { }
@@ -82,12 +81,11 @@ export class MaskingService {
   }
 
   public setDimensions(series: string): void {
-    this.imgDimension = series;
+    this.series = series;
   }
 
   public getDimensions(): void {
-    //console.log(this.imgDimensionConfig[this.imgDimension]);
-    return this.imgDimensionConfig[this.imgDimension];
+    return this.imgDimensionConfig[this.series];
   }
 
   public getImageUrl(): Observable<string> {
