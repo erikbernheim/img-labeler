@@ -67,18 +67,25 @@ export class GitManageComponent implements OnInit {
   public commit(sha: string, branch: string): void {
     let imgUrl = this.maskSvc.currentUrl.match(/[\w-]+\.png/)[0];
     const imgs2 = (imgUrl.indexOf('_') === 5);
-    console.log(imgs2)
+    const imgsd = (imgUrl.indexOf('_') === -1);
     this.svgToPng.base64ToGit()
     .then(base64 => {
     this.ngxService.start();
     let defaultMessage = `${imgUrl.replace('_', '').substr(0, 4)} ${this.userData.login}`
     if(imgs2){
       defaultMessage = `${imgUrl.replace('_', '').substr(0, 6)} ${this.userData.login}`
-    } 
+    } else if(imgsd) 
+    {
+      defaultMessage = `${imgUrl.replace('_', '').substr(0, 5)} ${this.userData.login}`
+    }
     const commitMessage =  prompt('Enter Commit Message', defaultMessage).valueOf();
     this.git.getTree(this.userData.login, sha).pipe(
       switchMap(ret => {
         if(imgs2) { return this.git.getTree(this.userData.login, ret.tree.filter(item => item.path === 'masks2')[0].sha); }
+        else if(imgsd)
+        {
+          return this.git.getTree(this.userData.login, ret.tree.filter(item => item.path === 'masksd')[0].sha);
+        }
         else{
           return this.git.getTree(this.userData.login, ret.tree.filter(item => item.path === 'masks')[0].sha);
         }

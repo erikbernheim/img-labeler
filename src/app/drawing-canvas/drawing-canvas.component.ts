@@ -522,7 +522,7 @@ export class DrawingCanvasComponent implements OnInit, AfterViewInit {
     public getLayerType(i: number): string {
 
         const colors = [['#402020 completePoly', 'Road'], ['#ff0000 completePoly', 'Lane Markings'], ['#808060 completePoly', 'Undrivable'],
-        ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car'], ['existingMask completePoly', 'Existing Mask']];
+        ['#00ff66 completePoly', 'Movable'], ['#cc00ff completePoly', 'My Car'], ['#00ccff completePoly', 'Interior Movable'], ['existingMask completePoly', 'Existing Mask']];
         for (const color of colors) {
             if (color[0] === this.svgElement.children[i].getAttribute('class')) {
                 return color[1];

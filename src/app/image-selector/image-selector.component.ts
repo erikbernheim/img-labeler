@@ -54,8 +54,24 @@ export class ImageSelectorComponent implements OnInit, AfterViewInit {
   }
 
   public updateImageByNum(number?: string): void {
-    if (!['e', 'f'].includes(this.num.nativeElement.value.slice(-1))) {
-      let imgN = this.num.nativeElement.value.padStart(4, '0');
+    if((number && (number.length === 5 || ['d'].includes(number))) || (this.num.nativeElement.value.length === 5 || ['d'].includes(this.num.nativeElement.value.slice(-1)) ))
+    {
+      let imgN = this.num.nativeElement.value.replace('d','').padStart(5, '0');
+
+      if (number) {
+        imgN = number.padStart(5, '0');
+        this.num.nativeElement.value = imgN;
+      }
+      if (lut.filter(element => element.id === imgN).length > 0) {
+        let url = `${environment.imagedDirectory}${lut.find(obj => obj.id === imgN).val}`;
+        this.url.nativeElement.value = url;
+        this.maskSvc.setImageUrl(url);
+      }
+      else {
+        alert(`Image ${imgN} does not exist.`);
+      }
+    }
+    else if (!(number && ['e','f'].includes(number)) && !['e', 'f'].includes(this.num.nativeElement.value.slice(-1))) {      let imgN = this.num.nativeElement.value.padStart(4, '0');
       if (number) {
         imgN = number.padStart(4, '0');
         this.num.nativeElement.value = imgN;

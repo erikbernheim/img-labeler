@@ -76,6 +76,9 @@ export class GitService {
     if(imageName.indexOf('_') === 5){
       url = `https://api.github.com/repos/${user}/comma10k/contents/masks2/${imageName}`;
     }
+    if(imageName.indexOf('_') === -1){
+      url = `https://api.github.com/repos/${user}/comma10k/contents/masksd/${imageName}`;
+    }
     return this.http.put(url, body, {headers: header});
   }
 }

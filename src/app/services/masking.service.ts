@@ -33,6 +33,12 @@ export class MaskingService {
       height: 1208,
       canvasWidth: 2014,
       canvasHeight: 1284
+    },
+    "imgsd": {
+      width: 1928,
+      height: 1208,
+      canvasWidth: 2014,
+      canvasHeight: 1284
     }
   };
 
